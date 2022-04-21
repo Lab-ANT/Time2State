@@ -7,19 +7,17 @@ This is the repository for the paper entitled "Time2Seg: An Unsupervised Framewo
 Running Time2State requires the installation of other packages.
 
 ```python
-# Clone Time2State
-git clone git@github.com:Lab-ANT/Time2State
-
 # Install TSpy
 git clone git@github.com:Lab-ANT/TSpy
-cd TSpy && python setup.py install && pip install requirements.txt && cd ..
+cd TSpy
+pip install requirements.txt
+python setup.py install
+cd ..
 
-# Install TSAGen
-git clone https://github.com/Lab-ANT/TSAGen
-cd TSAGen && python setup.py install && pip install requirements.txt && cd ..
-
-# Install other packages
-cd Time2State && pip install requirements.txt
+# Clone Time2State
+git clone git@github.com:Lab-ANT/Time2State
+cd Time2State
+pip install requirements.txt
 ```
 
 # Data Preparation
