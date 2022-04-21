@@ -9,7 +9,7 @@ from pyhsmm.util.text import progprint_xrange
 np.seterr(divide='ignore') # these warnings are usually harmless for this code
 from sklearn import cluster
 from hmmlearn.hmm import GaussianHMM, GMMHMM
-from Time2Seg.models.abstractions import *
+from Time2State.abstractions import *
 
 class GMM(BasicClusteringClass):
     def __init__(self, n_states):

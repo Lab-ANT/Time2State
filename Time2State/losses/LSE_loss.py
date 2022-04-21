@@ -69,31 +69,8 @@ class LSELoss(torch.nn.modules.loss._Loss):
                         loss1 += -torch.mean(torch.nn.functional.logsigmoid(torch.bmm(
                             embeddings[i].view(1, 1, size_representation),
                             embeddings[j].view(1, size_representation, 1))/self.tau))
-                        # v1 log sigmoid
-                        # loss1 += -torch.mean(torch.nn.functional.logsigmoid(
-                        #     torch.norm(embeddings[i]-embeddings[j],2)/self.tau))
-                        # v2 tanh
-                        # loss1 += -torch.mean(torch.nn.functional.tanh(
-                        #     -torch.norm(embeddings[i]-embeddings[j],2)/self.tau))
-                        # v3 sigmoid + dot
-                        # loss1 += -torch.mean(torch.nn.functional.sigmoid(torch.bmm(
-                        #     embeddings[i].view(1, 1, size_representation),
-                        #     embeddings[j].view(1, size_representation, 1))/self.tau))
-                        # v4 Asymmetric version
-                        # loss1 += -torch.mean(torch.nn.functional.logsigmoid(
-                        #     5-torch.norm(embeddings[i]-embeddings[j],2)/self.tau))
-                        # v5 cosine
-                        # d1 = torch.norm(embeddings[i],2)*torch.norm(embeddings[j],2)
-                        # loss1 += -torch.mean(torch.nn.functional.logsigmoid(torch.bmm(
-                        #     embeddings[i].view(1, 1, size_representation),
-                        #     embeddings[j].view(1, size_representation, 1))/d1))
             center = torch.mean(embeddings, dim=0)
             center_list.append(center)
-
-            # for i in range(N):
-            #     loss1 += -torch.mean(torch.nn.functional.logsigmoid(torch.bmm(
-            #                 embeddings[i].view(1, 1, size_representation),
-            #                 center.view(1, size_representation, 1))/self.tau))
         
         loss2=0
         for i in range(M):
@@ -103,26 +80,6 @@ class LSELoss(torch.nn.modules.loss._Loss):
                 loss2 += -torch.mean(torch.nn.functional.logsigmoid(-torch.bmm(
                     center_list[i].view(1, 1, size_representation),
                     center_list[j].view(1, size_representation, 1))/self.tau))
-                # v1 log sigmoid
-                # loss2 += -torch.mean(torch.nn.functional.logsigmoid(
-                #     torch.norm(center_list[i]-center_list[j],2)/self.tau))
-                # v2 tanh
-                # loss2 += -torch.mean(torch.nn.functional.tanh(
-                #     torch.norm(center_list[i]-center_list[j],2)/self.tau))
-                # v3 sigmoid
-                # loss2 += -torch.mean(torch.nn.functional.sigmoid(-torch.bmm(
-                #     center_list[i].view(1, 1, size_representation),
-                #     center_list[j].view(1, size_representation, 1))/self.tau))
-                # v4
-                # loss2 += -torch.mean(torch.nn.functional.logsigmoid(
-                #     torch.norm(center_list[i]-center_list[j],2)))
-                # v5 cosine
-                # d2 = torch.norm(center_list[i],2)*torch.norm(center_list[j],2)
-                # loss2 += -torch.mean(torch.nn.functional.logsigmoid(-torch.bmm(
-                #     center_list[i].view(1, 1, size_representation),
-                #     center_list[j].view(1, size_representation, 1))/d2))
 
-        loss = self.lambda1*loss1/(M*N*(N-1)/2) + loss2/(M*(M-1)/2)
-        # loss = self.lambda1*loss1/(M*N*(N-1)/2)
-        # loss = loss2/(M*(M-1)/2)
+        loss = loss1/(M*N*(N-1)/2) + loss2/(M*(M-1)/2)
         return loss

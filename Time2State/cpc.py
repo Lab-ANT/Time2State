@@ -129,10 +129,8 @@ class CausalConv_CPC():
         data = torch.tensor(data.T).unsqueeze(0)
         T = data.shape[-1]
         # print(data.shape)
-        windowed_data = np.concatenate(np.split(data[:, :, :T // 5 * 5], 5, -1), 0)
-        # windowed_data = np.concatenate([data,data])
-        # windowed_data = data
-        print(windowed_data.shape)
+        # windowed_data = np.concatenate(np.split(data[:, :, :T // 2 * 2], 2, -1), 0)
+        windowed_data = np.concatenate([data,data])
 
         learn_encoder(self.encoder, windowed_data, self.window_size, self.out_channels, n_epochs=epoch, lr=self.lr, decay=1e-5,  n_size=4,
             device=device, data=None, n_cross_val=1)
@@ -159,19 +157,3 @@ class CausalConv_CPC():
             i+=10
         embeddings = np.vstack(e_list)
         return embeddings
-
-# if __name__=="__main__":
-#     # main()
-#     data_path = os.path.join(os.path.dirname(__file__), '../data/')
-#     data, _ = load_USC_HAD(1, 1, data_path)
-#     cpc = CausalConv_CPC(128, 2, 6)
-#     cpc.fit_encoder(data, 20)
-    
-#     data_path = os.path.join(os.path.dirname(__file__), '../data/')
-#     embeddings = cpc.encode(data, 128, 10)
-#     plt.scatter(embeddings[:,0], embeddings[:,1])
-#     plt.savefig('emb.png')
-
-# data = np.ones((1, 4, 10000))
-# data2 = np.concatenate(np.split(data[:, :, :10000 // 5 * 5], 5, -1), 0)
-# print(data2.shape)

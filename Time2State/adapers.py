@@ -8,7 +8,7 @@ import os
 from TSpy.utils import all_normalize
 sys.path.append(os.path.dirname(__file__))
 import encoders
-from Time2Seg.models.abstractions import *
+from Time2State.abstractions import *
 import tnc
 import cpc
 
