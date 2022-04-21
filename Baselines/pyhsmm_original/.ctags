@@ -1,0 +1,9 @@
+--exclude=pyhsmm/deps
+--exclude=pyhsmm/basic/pybasicbayes
+--exclude=util
+--python-kinds=-i
+--recurse=yes
+--exclude=.git
+--exclude=.pyc
+--exclude=.md
+--exclude=DS_Store
