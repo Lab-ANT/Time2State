@@ -61,7 +61,7 @@ def PAMAP2_AutoPlait():
             f.writelines('../data/PAMAP2/data_for_AutoPlait/subject10'+str(i)+'.txt\n')
 
 def synthetic_for_AutoPlait_length():
-    data = np.loadtxt('../data/synthetic_data_for_segmentation/test0.csv', delimiter=',')
+    data = np.loadtxt(data_path+'/synthetic_data_for_segmentation/test0.csv', delimiter=',')
     data = np.concatenate([data[:,:4] for x in range(15)])
     for i in range(1,21):
         np.savetxt('../data/effect_of_length/'+str(i)+'.txt', data[:i*10000,:].round(4))
@@ -70,7 +70,7 @@ def synthetic_for_AutoPlait_length():
             f.writelines('../data/effect_of_length/'+str(i)+'.txt\n')
 
 def synthetic_for_AutoPlait_dim():
-    data = np.loadtxt('../data/synthetic_data_for_segmentation/test0.csv', delimiter=',')
+    data = np.loadtxt(data_path+'/synthetic_data_for_segmentation/test0.csv', delimiter=',')
     data = np.hstack([data, data, data, data, data])
     data = np.vstack([data, data])
     data = data[:30000,:]
@@ -81,8 +81,8 @@ def synthetic_for_AutoPlait_dim():
             f.writelines('../data/effect_of_dim/'+str(i)+'.txt\n')
 
 
-# synthetic_for_AutoPlait_length()
-# synthetic_for_AutoPlait_dim()
+synthetic_for_AutoPlait_length()
+synthetic_for_AutoPlait_dim()
 # PAMAP2_AutoPlait()
 # ActRecTut_AutoPlait()
-USC_HAD_AutoPlait()
+# USC_HAD_AutoPlait()
