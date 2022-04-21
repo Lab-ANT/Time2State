@@ -22,7 +22,7 @@ pip install requirements.txt
 
 # Data Preparation
 
-Download the dataset and put them in the following position.
+Download [PAMAP2](http://www.pamap.org/demo.html) and [USC-HAD](http://sipi.usc.edu/had/) and put them in the following position. 
 
 ```
 .
