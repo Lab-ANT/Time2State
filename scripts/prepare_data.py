@@ -28,7 +28,7 @@ def USC_HAD_AutoPlait():
     with open(data_path+'USC-HAD_for_AutoPlait/list', 'w') as f:
         for subject in range(1,15):
             for target in range(1,6):
-                f.writelines('../../data/USC-HAD_for_AutoPlait/s'+str(subject)+'t'+str(target)+'.txt\n')
+                f.writelines(data_path+'/USC-HAD_for_AutoPlait/s'+str(subject)+'t'+str(target)+'.txt\n')
 
 def ActRecTut_AutoPlait():
     for s in ['subject1_walk', 'subject2_walk']:
@@ -42,11 +42,10 @@ def ActRecTut_AutoPlait():
     #         f.writelines('../data/ActRecTut/data_for_AutoPlait/'+s+'.txt\n')
 
 def PAMAP2_AutoPlait():
-    if not os.path.exists('../data/PAMAP2/data_for_AutoPlait'):
-        os.makedirs('../data/PAMAP2/data_for_AutoPlait')
-    # groundtruth_list = []
+    if not os.path.exists(data_path+'/PAMAP2/data_for_AutoPlait'):
+        os.makedirs(data_path+'/PAMAP2/data_for_AutoPlait')
     for i in range(1,10):
-        dataset_path = os.path.join('../data/','PAMAP2/Protocol/subject10'+str(i)+'.dat')
+        dataset_path = os.path.join(data_path,'PAMAP2/Protocol/subject10'+str(i)+'.dat')
         data = np.loadtxt(dataset_path)
         groundtruth = np.array(data[:,1],dtype=int)
         hand_acc = data[:,4:7]
@@ -54,20 +53,20 @@ def PAMAP2_AutoPlait():
         ankle_acc = data[:,38:41]
         data = np.hstack([hand_acc, chest_acc, ankle_acc])
         data = fill_nan(data)
-        np.savetxt('../data/PAMAP2/data_for_AutoPlait/subject10'+str(i)+'.txt', data)
-        np.savetxt('../data/PAMAP2/data_for_AutoPlait/groundtruth_subject10'+str(i)+'.txt', groundtruth)
-    with open('../data/PAMAP2/data_for_AutoPlait/list', 'w') as f:
+        np.savetxt(data_path+'/PAMAP2/data_for_AutoPlait/subject10'+str(i)+'.txt', data)
+        np.savetxt(data_path+'/PAMAP2/data_for_AutoPlait/groundtruth_subject10'+str(i)+'.txt', groundtruth)
+    with open(data_path+'/PAMAP2/data_for_AutoPlait/list', 'w') as f:
         for i in range(1,21):
-            f.writelines('../data/PAMAP2/data_for_AutoPlait/subject10'+str(i)+'.txt\n')
+            f.writelines(data_path+'/PAMAP2/data_for_AutoPlait/subject10'+str(i)+'.txt\n')
 
 def synthetic_for_AutoPlait_length():
     data = np.loadtxt(data_path+'/synthetic_data_for_segmentation/test0.csv', delimiter=',')
     data = np.concatenate([data[:,:4] for x in range(15)])
     for i in range(1,21):
-        np.savetxt('../data/effect_of_length/'+str(i)+'.txt', data[:i*10000,:].round(4))
-    with open('../data/effect_of_length/list', 'w') as f:
+        np.savetxt(data_path+'/effect_of_length/'+str(i)+'.txt', data[:i*10000,:].round(4))
+    with open(data_path+'/effect_of_length/list', 'w') as f:
         for i in range(1,21):
-            f.writelines('../data/effect_of_length/'+str(i)+'.txt\n')
+            f.writelines(data_path+'/effect_of_length/'+str(i)+'.txt\n')
 
 def synthetic_for_AutoPlait_dim():
     data = np.loadtxt(data_path+'/synthetic_data_for_segmentation/test0.csv', delimiter=',')
@@ -81,8 +80,8 @@ def synthetic_for_AutoPlait_dim():
             f.writelines('../data/effect_of_dim/'+str(i)+'.txt\n')
 
 
-synthetic_for_AutoPlait_length()
-synthetic_for_AutoPlait_dim()
-# PAMAP2_AutoPlait()
+# synthetic_for_AutoPlait_length()
+# synthetic_for_AutoPlait_dim()
+PAMAP2_AutoPlait()
 # ActRecTut_AutoPlait()
-# USC_HAD_AutoPlait()
+USC_HAD_AutoPlait()

@@ -42,6 +42,11 @@ Download the dataset and put them in the following position.
 │   │   ├── ...
 ```
 
+Once the data is placed correctly, run the following script.
+```
+python ./scripts prepare_data.py
+```
+
 # How to Run
 
 run the *.py files in ./experiments directly
