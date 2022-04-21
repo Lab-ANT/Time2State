@@ -21,3 +21,14 @@ cd TSAGen && python setup.py install && pip install requirements.txt && cd ..
 # Install other packages
 cd Time2State && pip install requirements.txt
 ```
+
+# Data Preparation
+
+Download the dataset and put them in the ./data folder.
+
+
+# How to Run
+
+run the *.py files in ./experiments directly
+
+# Examples
