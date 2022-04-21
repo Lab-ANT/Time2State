@@ -56,4 +56,3 @@ def run_exp():
 
 if __name__ == '__main__':
     run_exp()
-    # exp_on_USC_HAD(10,2, verbose=True)

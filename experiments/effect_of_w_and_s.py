@@ -33,7 +33,7 @@ def exp_on_USC_HAD(t2s, win_size, step, verbose=False):
     return np.mean(score_list[:,0])
 
 def run_exp():
-    for win_size in [400]:
+    for win_size in [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]:
         ARI_list = []
         params_LSE['in_channels'] = 6
         params_LSE['compared_length'] = win_size

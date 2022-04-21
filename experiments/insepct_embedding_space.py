@@ -115,7 +115,6 @@ embeddings_CPC = np.loadtxt(os.path.join(result_path+'/embeddings_CPC.txt'))
 # plt.title('CPC')
 # plt.savefig('CPC.pdf')
 
-# plt.figure(figsize=(8,2))
 # plt.style.use('classic')
 # fig, ax = plt.subplots(nrows=5)
 # for i in range(4):
@@ -129,30 +128,78 @@ embeddings_CPC = np.loadtxt(os.path.join(result_path+'/embeddings_CPC.txt'))
 # plt.tight_layout()
 # plt.show()
 
-grid_ = plt.GridSpec(5,4)
-plt.style.use('classic')
-plt.subplot(grid_[0,:])
-plt.show()
+def embedding_space22(embeddings, label=None, alpha=0.5, s=0.1, color='blue', show=False):
+    color_list = ['b', 'r', 'g', 'purple', 'y', 'gray']
+    embeddings = np.array(embeddings)
+    x = embeddings[:,0]
+    y = embeddings[:,1]
+    plt.style.use('classic')
+    plt.grid()
+    i = 0
+    if label is not None:
+        for l in set(label):
+            idx = np.argwhere(label==l)
+            plt.scatter(x[idx],y[idx],alpha=alpha,s=s, color=color_list[i])
+            i+=1
+    else:
+        plt.scatter(x,y,alpha=0.5,s=s)
+    plt.xticks(size=5)
+    plt.yticks(size=5)
+    
+    
+# plt.figure(figsize=(4,5))
+# grid_ = plt.GridSpec(11,8, wspace=8, hspace=8)
+# # grid_ = plt.GridSpec(11,8)
+# plt.style.use('classic')
+# plt.subplot(grid_[0:2,:])
+# for i in range(4):
+#     plt.plot(data[:,i], lw=0.8)
+# plt.yticks([-2, -1, 0, 1, 2])
 
-# def embedding_space(embeddings, label=None, alpha=0.8, s=0.1, color='blue', show=False):
-#     color_list = ['b', 'r', 'g', 'purple', 'y', 'gray']
-#     embeddings = np.array(embeddings)
-#     x = embeddings[:,0]
-#     y = embeddings[:,1]
-#     # plt.style.use('ggplot')
-#     plt.style.use('classic')
-#     # plt.style.use('bmh')
-#     plt.figure(figsize=(4,4))
-#     plt.grid()
-#     i = 0
-#     if label is not None:
-#         for l in set(label):
-#             idx = np.argwhere(label==l)
-#             plt.scatter(x[idx],y[idx],alpha=alpha,s=s, color=color_list[i])
-#             # plt.scatter(x[idx],y[idx],alpha=alpha,s=s)
-#             i+=1
-#     else:
-#         plt.scatter(x,y,alpha=alpha,s=s)
-#     if show:
-#         # plt.tight_layout()
-#         plt.show()
+# plt.subplot(grid_[3:7,0:4])
+# embedding_space22(embeddings_LSE, show=False, s=1, label=groundtruth[:len(embeddings_LSE)])
+# plt.title('LSE',size=10)
+# plt.subplot(grid_[3:7,4:8])
+# embedding_space22(embeddings_Triplet, show=False, s=1, label=groundtruth[:len(embeddings_Triplet)])
+# plt.title('Triplet',size=10)
+
+# plt.subplot(grid_[7:11,0:4])
+# embedding_space22(embeddings_TNC, show=False, s=1, label=groundtruth[:len(embeddings_TNC)])
+# plt.title('TNC',size=10)
+
+# plt.subplot(grid_[7:11,4:8])
+# embedding_space22(embeddings_CPC, show=False, s=1, label=groundtruth[:len(embeddings_CPC)])
+# plt.title('CPC',size=10)
+
+# # plt.tight_layout()
+# plt.show()
+
+
+plt.figure(figsize=(4,5))
+grid_ = plt.GridSpec(10,8, wspace=8, hspace=8)
+# grid_ = plt.GridSpec(11,8)
+plt.style.use('classic')
+plt.subplot(grid_[0:2,:])
+for i in range(4):
+    plt.plot(data[:,i], lw=0.8)
+plt.yticks([-2, -1, 0, 1, 2],size=5)
+plt.xticks(size=5)
+plt.title('Raw Data',size=8)
+
+plt.subplot(grid_[2:6,0:4])
+embedding_space22(embeddings_LSE, show=False, s=.3, label=groundtruth[:len(embeddings_LSE)])
+plt.title('LSE',size=8)
+plt.subplot(grid_[2:6,4:8])
+embedding_space22(embeddings_Triplet, show=False, s=.3, label=groundtruth[:len(embeddings_Triplet)])
+plt.title('Triplet',size=8)
+
+plt.subplot(grid_[6:10,0:4])
+embedding_space22(embeddings_TNC, show=False, s=.3, label=groundtruth[:len(embeddings_TNC)])
+plt.title('TNC',size=8)
+
+plt.subplot(grid_[6:10,4:8])
+embedding_space22(embeddings_CPC, show=False, s=.3, label=groundtruth[:len(embeddings_CPC)])
+plt.title('CPC',size=8)
+
+# plt.tight_layout()
+plt.show()
