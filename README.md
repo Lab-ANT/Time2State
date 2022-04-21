@@ -24,11 +24,24 @@ cd Time2State && pip install requirements.txt
 
 # Data Preparation
 
-Download the dataset and put them in the ./data folder.
+Download the dataset and put them in the following position.
 
+```
+.
+├── data
+│   ├── ActRecTut
+│   ├── synthetic_data_for_segmentation
+│   ├── MoCap
+│   ├── PAMAP2
+│   │   ├── Protocol
+│   │   │   ├── subject101.dat
+│   │   │   ├── ...
+│   ├── USC-HAD
+│   │   ├── Subject1
+│   │   ├── Subject2
+│   │   ├── ...
+```
 
 # How to Run
 
 run the *.py files in ./experiments directly
-
-# Examples
