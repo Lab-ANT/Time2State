@@ -1,6 +1,6 @@
 # Time2State
 
-This is the repository for the paper entitled "Time2Seg: An Unsupervised Framework for Inferring the Latent State in Time Series Data".
+This is the repository for the paper entitled "Time2State: An Unsupervised Framework for Inferring the Latent State in Time Series Data".
 
 # Installation
 
