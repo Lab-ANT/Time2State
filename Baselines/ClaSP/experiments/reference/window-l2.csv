@@ -1,0 +1,99 @@
+name,found_cps,score
+Cane,[3535],0.222846
+DutchFactory,[210],0.225317
+EEGRat,[865],0.0675
+EEGRat2,[1615],0.3075
+Fetal2013,"[1130, 10335]",0.363056
+GrandMalSeizures,[15715],0.407715
+GrandMalSeizures2,[2290],0.21662
+GreatBarbet1,"[180, 610]",0.640426
+GreatBarbet2,"[35, 285]",0.740426
+InsectEPG1,[2530],0.074819
+InsectEPG2,[7375],0.557444
+InsectEPG3,[1695],0.002143
+InsectEPG4,[10030],0.36156
+NogunGun,[3825],0.111743
+PigInternalBleedingDatasetAirwayPressure,[12440],0.32986
+PigInternalBleedingDatasetArtPressureFluidFilled,[8960],0.097442
+PigInternalBleedingDatasetCVP,[7525],0.001603
+Powerdemand,[4110],0.050768
+PulsusParadoxusECG1,[9215],0.044803
+PulsusParadoxusECG2,[9565],0.024827
+PulsusParadoxusSP02,[17195],0.41065
+RoboticDogActivityX,[5790],0.229073
+RoboticDogActivityY,[7790],0.197905
+RoboticDogActivityZ,[2165],0.166818
+SimpleSynthetic,"[1320, 2200]",0.309961
+SuddenCardiacDeath1,"[7120, 7320]",0.063333
+SuddenCardiacDeath2,[2340],0.075827
+SuddenCardiacDeath3,[620],0.219148
+TiltABP,[24940],0.0015
+TiltECG,[33790],0.21975
+WalkJogRun1,"[640, 9895]",0.625437
+WalkJogRun2,"[1430, 3505]",0.266473
+Adiac,"[1140, 1315, 1325]",0.190341
+ArrowHead,[685],0.045153
+Beef,[915],0.148936
+BeetleFly,[2505],0.478516
+BirdChicken,[1380],0.039062
+Car,"[1295, 1475, 1715]",0.176144
+CBF,"[465, 635]",0.15625
+ChlorineConcentration,[3565],0.153826
+CinCECGTorso,"[95, 3380]",0.458223
+Coffee,[745],0.245
+Computers,[4660],0.085778
+CricketX,"[630, 1155, 1190, 1360]",0.126132
+CricketY,"[865, 1265, 1660, 1920]",0.214704
+CricketZ,"[65, 405, 1005, 1495]",0.334928
+DiatomSizeReduction,"[95, 440]",0.385924
+DistalPhalanxOutlineAgeGroup,[1245],0.660839
+DistalPhalanxTW,"[100, 2480]",0.286822
+Earthquakes,[8605],0.015237
+ECG200,[395],0.145417
+ECG5000,[1905],0.306192
+ECGFiveDays,[595],0.152174
+ElectricDevices,"[9185, 9385, 11165, 11195]",0.801075
+FaceAll,"[2590, 4365, 6715, 8070, 8100, 8265]",0.161941
+FaceFour,"[1390, 3860, 3895]",0.424405
+FacesUCR,"[2530, 3050, 4450, 5870, 6260, 6395]",0.464754
+FiftyWords,"[1895, 2200, 2335]",0.224211
+Fish,"[4045, 6040, 6705, 6715, 6830, 7005]",0.173548
+GunPoint,[1095],0.104
+Haptics,"[55, 300]",0.358044
+InlineSkate,"[2235, 4675]",0.506119
+InsectWingbeatSound,"[550, 560, 1105]",0.246094
+ItalyPowerDemand,[1040],0.139303
+LargeKitchenAppliances,"[5135, 6875]",0.206259
+Lightning2,[285],0.09464
+Lightning7,"[270, 1175, 1880, 2020]",0.343019
+Mallat,"[2085, 2340, 2470]",0.151966
+Meat,"[1780, 3180]",0.416667
+MedicalImages,[545],0.47979
+MoteStrain,[1065],0.133929
+NonInvasiveFetalECGThorax1,"[910, 4190, 5785, 6160, 7565]",0.153543
+NonInvasiveFetalECGThorax2,"[910, 5035, 5315, 5785, 6160, 11925]",0.256752
+OliveOil,"[3210, 4635]",0.192308
+OSULeaf,"[1070, 1105]",0.173558
+Plane,"[2445, 2595, 2625, 2775, 2955, 2985]",0.236508
+ProximalPhalanxOutlineAgeGroup,"[2845, 3025]",0.4125
+ProximalPhalanxTW,"[3720, 3780, 3860]",0.095
+ShapesAll,"[2305, 2430, 3845, 5460]",0.114062
+SonyAIBORobotSurface1,[425],0.003571
+SonyAIBORobotSurface2,[350],0.207977
+StarLightCurves,"[1665, 1740]",0.210378
+SwedishLeaf,"[1075, 1715, 1805]",0.180836
+Symbols,"[100, 895, 995]",0.526204
+SyntheticControl,"[3060, 3405, 3570, 3600]",0.436
+ToeSegmentation1,[2305],0.33213
+ToeSegmentation2,[2400],0.277706
+Trace,"[1855, 3710]",0.229453
+TwoLeadECG,[135],0.235669
+TwoPatterns,"[2825, 3015, 3660]",0.2385
+UWaveGestureLibraryAll,"[6065, 7015, 7280, 7960]",0.357253
+UWaveGestureLibraryX,"[1965, 2525, 2555, 2575]",0.46274
+UWaveGestureLibraryY,"[1340, 1640, 1655, 2630]",0.234564
+UWaveGestureLibraryZ,"[1610, 1890, 1960, 1975]",0.259404
+Wafer,[765],0.547599
+WordSynonyms,"[1345, 1815]",0.540292
+Worms,"[790, 1175]",0.317961
+Yoga,[5875],0.088894

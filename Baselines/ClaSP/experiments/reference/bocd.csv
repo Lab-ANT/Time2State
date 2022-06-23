@@ -1,0 +1,99 @@
+name,found_cps,score
+Cane,[208],0.400187
+DutchFactory,[5316],0.357493
+EEGRat,[1158],0.079
+EEGRat2,[286],0.357
+Fetal2013,[3394 2342],0.348
+GrandMalSeizures,[15961],0.421061
+GrandMalSeizures2,[4808],0.024729
+GreatBarbet1,[2558 2554],0.279149
+GreatBarbet2,[2207 2523],0.197872
+InsectEPG1,[202],0.211752
+InsectEPG2,[196],0.160384
+InsectEPG3,[196],0.216255
+InsectEPG4,[202],0.155676
+NogunGun,[370],0.356224
+PigInternalBleedingDatasetAirwayPressure,[10568],0.204835
+PigInternalBleedingDatasetArtPressureFluidFilled,[7328],0.011554
+PigInternalBleedingDatasetCVP,[8197],0.046484
+Powerdemand,[41],0.580448
+PulsusParadoxusECG1,[3356],0.379202
+PulsusParadoxusECG2,[15607],0.320016
+PulsusParadoxusSP02,[17323],0.417956
+RoboticDogActivityX,[475],0.64761
+RoboticDogActivityY,[467],0.696102
+RoboticDogActivityZ,[1478],0.229273
+SimpleSynthetic,[3140   76],0.382952
+SuddenCardiacDeath1,[ 877 7569],0.446167
+SuddenCardiacDeath2,[2617],0.052746
+SuddenCardiacDeath3,[1897],0.112741
+TiltABP,[27553],0.063825
+TiltECG,[34008],0.2252
+WalkJogRun1,[144 323],0.713229
+WalkJogRun2,[3774 3758],0.006799
+Adiac,[614 602 592],0.065341
+ArrowHead,[60],0.460159
+Beef,[549],0.110638
+BeetleFly,[275],0.392578
+BirdChicken,[450],0.324219
+Car,[1187 1178 1169],0.033287
+CBF,[186 177],0.421875
+ChlorineConcentration,[420],0.249327
+CinCECGTorso,[855 646],0.533547
+Coffee,[193],0.307
+Computers,[1566],0.3608
+CricketX,[668 650 644 632],0.082147
+CricketY,[782 762 744 736],0.300586
+CricketZ,[839 754 745 735],0.2477
+DiatomSizeReduction,[ 640 1245],0.324826
+DistalPhalanxOutlineAgeGroup,[],1.0
+DistalPhalanxTW,[2574 2568],0.272093
+Earthquakes,[241],0.796487
+ECG200,[635],0.045417
+ECG5000,[526],0.366163
+ECGFiveDays,[301],0.223785
+ElectricDevices,[  208 11317 11086  9390],0.772286
+FaceAll,[1062 1034 1000  993  971  973],0.199237
+FaceFour,[4069 4061 3357],0.3675
+FacesUCR,[783 779 769 716 712 706],0.098874
+FiftyWords,[392 384 381],0.790608
+Fish,[ 100   86   72   57 3842  460],0.738147
+GunPoint,[1154],0.135467
+Haptics,[ 325 1197],0.159168
+InlineSkate,[4199 2425],0.367973
+InsectWingbeatSound,[599 595 583],0.111719
+ItalyPowerDemand,[745],0.044154
+LargeKitchenAppliances,[ 266 5224],0.349218
+Lightning2,[435],0.030988
+Lightning7,[1857 2456 2026 4888],0.314574
+Mallat,[2659  355 3171],0.283014
+Meat,[2613 2781],0.272024
+MedicalImages,[2326],0.240097
+MoteStrain,[69],0.458929
+NonInvasiveFetalECGThorax1,[155 118 108  76  85],0.635507
+NonInvasiveFetalECGThorax2,[248 211 202 167 188 156],0.634437
+OliveOil,[4908 5478],0.401619
+OSULeaf,[1873 1849],0.174038
+Plane,[1078 1071 1050 1042 1037 1014],0.028042
+ProximalPhalanxOutlineAgeGroup,[3997 3987],0.941
+ProximalPhalanxTW,[2448 2433 2428],0.04775
+ShapesAll,[3414 5759 4772 6016],0.360781
+SonyAIBORobotSurface1,[321],0.070714
+SonyAIBORobotSurface2,[519],0.111681
+StarLightCurves,[ 713 1386],0.077212
+SwedishLeaf,[1203 1198 1188],0.184972
+Symbols,[1610 1671 1768],0.146109
+SyntheticControl,[ 364  773  770 2288],0.124533
+ToeSegmentation1,[1910],0.189531
+ToeSegmentation2,[116],0.462411
+Trace,[ 233 1265],0.272906
+TwoLeadECG,[406],0.339703
+TwoPatterns,[ 383  393 5842],0.47275
+UWaveGestureLibraryAll,[1531 1524 1520 1518],0.131339
+UWaveGestureLibraryX,[860 864 856 844],0.363378
+UWaveGestureLibraryY,[1832 1830 1828 1825],0.250887
+UWaveGestureLibraryZ,[ 894  880  928 1004],0.290277
+Wafer,[224],0.091828
+WordSynonyms,[401 393],0.162839
+Worms,[702 688],0.147249
+Yoga,[191],0.444723
