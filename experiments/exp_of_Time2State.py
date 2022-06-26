@@ -15,7 +15,7 @@ from Time2State.clustering import *
 from Time2State.default_params import *
 
 data_path = os.path.join(os.path.dirname(__file__), '../data/')
-output_path = os.path.join(os.path.dirname(__file__), '../output/result_of_Time2Seg/')
+output_path = os.path.join(os.path.dirname(__file__), '../output/')
 
 dataset_info = {'amc_86_01.4d':{'n_segs':4, 'label':{588:0,1200:1,2006:0,2530:2,3282:0,4048:3,4579:2}},
         'amc_86_02.4d':{'n_segs':8, 'label':{1009:0,1882:1,2677:2,3158:3,4688:4,5963:0,7327:5,8887:6,9632:7,10617:0}},
@@ -28,6 +28,50 @@ dataset_info = {'amc_86_01.4d':{'n_segs':4, 'label':{588:0,1200:1,2006:0,2530:2,
         'amc_86_14.4d':{'n_segs':3, 'label':{671:0,1913:1,2931:0,4134:2,5051:0,5628:1,6055:2}},
 }
 
+def exp_on_UCR_SEG(win_size, step, verbose=False):
+    score_list = []
+    params_Triplet['in_channels'] = 1
+    params_Triplet['compared_length'] = win_size
+    params_LSE['in_channels'] = 1
+    params_LSE['M'] = 10
+    params_LSE['N'] = 4
+    params_LSE['out_channels'] = 2
+    params_LSE['nb_steps'] = 20
+    params_LSE['compared_length'] = win_size
+    params_LSE['kernel_size'] = 7
+    dataset_path = os.path.join(data_path,'UCR-SEG/UCR_datasets_seg/')
+    for fname in os.listdir(dataset_path):
+        info_list = fname[:-4].split('_')
+        # f = info_list[0]
+        # window_size = int(info_list[1])
+        seg_info = {}
+        i = 0
+        for seg in info_list[2:]:
+            seg_info[int(seg)]=i
+            i+=1
+        seg_info[len_of_file(dataset_path+fname)]=i
+        num_state=len(seg_info)
+        df = pd.read_csv(dataset_path+fname)
+        data = df.to_numpy()
+        data = normalize(data)
+        t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
+        # t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), KMeansClustering(num_state)).fit(data, win_size, step)
+        # t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), HDP_HSMM(None)).fit(data, win_size, step)
+        # t2s = Time2State(win_size, step, CausalConv_Triplet_Adaper(params_Triplet), DPGMM(None)).fit(data, win_size, step)
+        # t2s = Time2State(win_size, step, CausalConv_TNC_Adaper(params_TNC), DPGMM(None)).fit(data, win_size, step)
+        groundtruth = seg_to_label(seg_info)[:-1]
+        prediction = t2s.state_seq
+        ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
+        score_list.append(np.array([ari, anmi, nmi]))
+        plot_mulvariate_time_series_and_label_v2(data,groundtruth,prediction)
+        plt.savefig('1.png')
+        if verbose:
+            print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(fname, ari, anmi, nmi))
+    score_list = np.vstack(score_list)
+    print('AVG ---- ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list[:,0])\
+        ,np.mean(score_list[:,1])
+        ,np.mean(score_list[:,2])))
+
 def exp_on_MoCap(win_size, step, verbose=False):
     base_path = os.path.join(data_path,'MoCap/4d/')
     score_list = []
@@ -36,6 +80,7 @@ def exp_on_MoCap(win_size, step, verbose=False):
     params_LSE['M'] = 10
     params_LSE['N'] = 4
     params_LSE['out_channels'] = 4
+    # params_LSE['kernel_size'] = 5
     params_Triplet['in_channels'] = 4
     params_Triplet['compared_length'] = win_size
     params_TNC['in_channels'] = 4
@@ -52,8 +97,8 @@ def exp_on_MoCap(win_size, step, verbose=False):
         groundtruth = seg_to_label(dataset_info[fname]['label'])[:-1]
         # print(data.shape)
         # t2s = Time2State(win_size, step, CausalConv_Triplet_Adaper(params_Triplet), DPGMM(None)).fit(data, win_size, step)
-        t2s = Time2State(win_size, step, CausalConv_CPC_Adaper(params_CPC), DPGMM(None)).fit(data, win_size, step)
-        # t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
+        # t2s = Time2State(win_size, step, CausalConv_CPC_Adaper(params_CPC), DPGMM(None)).fit(data, win_size, step)
+        t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
         # t2s = Time2State(win_size, step, LSTM_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
         # t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), KMeansClustering(n_state)).fit(data, win_size, step)
         # t2s = Time2State(win_size, step, CausalConv_TNC_Adaper(params_TNC), DPGMM(None)).fit(data, win_size, step)
@@ -112,6 +157,8 @@ def exp_on_synthetic(win_size=512, step=100, verbose=False):
         ari2, anmi2, nmi2 = evaluate_clustering(groundtruth, prediction2)
         score_list.append(np.array([ari, anmi, nmi]))
         score_list2.append(np.array([ari2, anmi2, nmi2]))
+        # plot_mulvariate_time_series_and_label_v2(data,groundtruth,prediction)
+        # plt.savefig('1.png')
         if verbose:
             print('ID: %d, ARI: %f, ANMI: %f, NMI: %f' %(i, ari, anmi, nmi))
             print('ID: %d, ARI: %f, ANMI: %f, NMI: %f' %(i, ari2, anmi2, nmi2))
@@ -142,7 +189,7 @@ def exp_on_ActRecTut(win_size, step, verbose=False):
 
     # train
     if True:
-        dataset_path = os.path.join(data_path,'ActRecTut/subject1_gesture/data.mat')
+        dataset_path = os.path.join(data_path,'ActRecTut/subject1_walk/data.mat')
         data = scipy.io.loadmat(dataset_path)
         # print(data)
         groundtruth = data['labels'].flatten()
@@ -157,8 +204,7 @@ def exp_on_ActRecTut(win_size, step, verbose=False):
         t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit_encoder(data)
         # t2s = Time2State(win_size, step, CausalConv_TNC_Adaper(params_TNC), DPGMM(None)).fit(data, win_size, step)
         # t2s = Time2State(win_size, step, CausalConv_Triplet_Adaper(params_Triplet), DPGMM(None)).fit(data, win_size, step)
-    # dir_list = ['subject1_walk', 'subject2_walk']
-    dir_list = ['subject1_gesture', 'subject2_gesture']
+    dir_list = ['subject1_walk', 'subject2_walk']
     for dir_name in dir_list:
         dataset_path = os.path.join(data_path,'ActRecTut/'+dir_name+'/data.mat')
         data = scipy.io.loadmat(dataset_path)
@@ -201,8 +247,10 @@ def exp_on_PAMAP2(win_size, step, verbose=False):
     params_LSE['compared_length'] = win_size
     params_LSE['out_channels'] = 4
     params_LSE['M'] = 20
-    params_LSE['N'] = 6
+    params_LSE['N'] = 4
     params_LSE['nb_steps'] = 40
+    params_LSE['kernel_size'] = 5
+    
     params_Triplet['in_channels'] = 9
     params_Triplet['compared_length'] = win_size
     params_TNC['in_channels'] = 9
@@ -256,7 +304,8 @@ def exp_on_PAMAP2(win_size, step, verbose=False):
         print(groundtruth.shape, prediction.shape)
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         score_list.append(np.array([ari, anmi, nmi]))
-        # plot_mulvariate_time_series_and_label(data[0].T, label=prediction, groundtruth=groundtruth)
+        plot_mulvariate_time_series_and_label_v2(data,groundtruth,prediction)
+        plt.savefig('1.png')
         if verbose:
             print('ID: %d, ARI: %f, ANMI: %f, NMI: %f' %(i, ari, anmi, nmi))
     score_list = np.vstack(score_list)
@@ -273,7 +322,7 @@ def exp_on_USC_HAD(win_size, step, verbose=False):
     params_LSE['M'] = 20
     params_LSE['N'] = 4
     params_LSE['nb_steps'] = 40
-    # params_LSE['kernel_size'] = 5
+    params_LSE['kernel_size'] = 5
     # params_LSE['depth'] = 12
     # params_LSE['out_channels'] = 2
     params_Triplet['in_channels'] = 6
@@ -311,6 +360,8 @@ def exp_on_USC_HAD(win_size, step, verbose=False):
             score_list2.append(np.array([ari2, anmi2, nmi2]))
             f_list.append(np.array([f1, p, r]))
             # plot_mulvariate_time_series_and_label_v2(data2, groundtruth, prediction)
+            # plot_mulvariate_time_series_and_label_v2(data,groundtruth,prediction)
+            # plt.savefig('1.png')
             if verbose:
                 print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %('s'+str(subject)+'t'+str(target), ari, anmi, nmi))
                 print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %('s'+str(subject)+'t'+str(target), ari2, anmi2, nmi2))
@@ -342,10 +393,11 @@ def run_exp():
 if __name__ == '__main__':
     # run_exp()
     # time_start=time.time()
-    exp_on_MoCap(256, 50, verbose=True)
-    exp_on_PAMAP2(512,100, verbose=True)
-    exp_on_ActRecTut(64, 10, verbose=True)
-    exp_on_synthetic(256, 50, verbose=True)
-    exp_on_USC_HAD(256, 50, verbose=True)
+    exp_on_UCR_SEG(256, 50, verbose=True)
+    # exp_on_MoCap(256, 50, verbose=True)
+    # exp_on_PAMAP2(512,100, verbose=True)
+    # exp_on_ActRecTut(256, 50, verbose=True)
+    # exp_on_synthetic(256, 50, verbose=True)
+    # exp_on_USC_HAD(256, 50, verbose=True)
     # time_end=time.time()
     # print('time',time_end-time_start)
