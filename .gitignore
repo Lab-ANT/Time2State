@@ -6,3 +6,6 @@ Baselines/AutoPlait/output
 *.npy
 *.npz
 .vscode
+UCR-SEG
+USC-HAD
+PAMAP2
