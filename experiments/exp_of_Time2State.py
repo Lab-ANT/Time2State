@@ -38,7 +38,7 @@ def exp_on_UCR_SEG(win_size, step, verbose=False):
     params_LSE['out_channels'] = 2
     params_LSE['nb_steps'] = 20
     params_LSE['compared_length'] = win_size
-    params_LSE['kernel_size'] = 7
+    params_LSE['kernel_size'] = 5
     dataset_path = os.path.join(data_path,'UCR-SEG/UCR_datasets_seg/')
     for fname in os.listdir(dataset_path):
         info_list = fname[:-4].split('_')
@@ -146,13 +146,13 @@ def exp_on_synthetic(win_size=512, step=100, verbose=False):
         data = df.to_numpy()
         df = pd.read_csv(prefix+str(i)+'.csv', usecols=[4], skiprows=1)
         groundtruth = df.to_numpy(dtype=int).flatten()
-        # segmentor = Time2State(win_size, step, CausalConv_CPC_Adaper(params_CPC), DPGMM(None)).fit(data, win_size, step)
-        segmentor = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
-        # segmentor = Time2State(win_size, step, LSTM_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
-        # segmentor = Time2State(win_size, step, CausalConv_Triplet_Adaper(params_Triplet), DPGMM(None)).fit(data, win_size, step)
-        prediction = segmentor.state_seq
-        segmentor.set_clustering_component(KMeansClustering(5)).predict_without_encode(data, win_size, step)
-        prediction2 = segmentor.state_seq
+        # t2s = Time2State(win_size, step, CausalConv_CPC_Adaper(params_CPC), DPGMM(None)).fit(data, win_size, step)
+        t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
+        # t2s = Time2State(win_size, step, LSTM_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
+        # t2s = Time2State(win_size, step, CausalConv_Triplet_Adaper(params_Triplet), DPGMM(None)).fit(data, win_size, step)
+        prediction = t2s.state_seq
+        t2s.set_clustering_component(KMeansClustering(5)).predict_without_encode(data, win_size, step)
+        prediction2 = t2s.state_seq
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         ari2, anmi2, nmi2 = evaluate_clustering(groundtruth, prediction2)
         score_list.append(np.array([ari, anmi, nmi]))
@@ -393,8 +393,8 @@ def run_exp():
 if __name__ == '__main__':
     # run_exp()
     # time_start=time.time()
-    exp_on_UCR_SEG(256, 50, verbose=True)
-    # exp_on_MoCap(256, 50, verbose=True)
+    # exp_on_UCR_SEG(512, 50, verbose=True)
+    exp_on_MoCap(256, 50, verbose=True)
     # exp_on_PAMAP2(512,100, verbose=True)
     # exp_on_ActRecTut(256, 50, verbose=True)
     # exp_on_synthetic(256, 50, verbose=True)
