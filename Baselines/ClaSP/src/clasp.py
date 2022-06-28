@@ -263,7 +263,10 @@ def extract_clasp_cps_from_multivariate_ts(time_series, window_size, n_change_po
     queue = PriorityQueue()
 
     # compute global clasp
-    _, dim = time_series.shape
+    if len(time_series.shape) == 1:
+        dim = 1
+    else:
+        _, dim = time_series.shape
 
     if dim == 1:
         profile, knn_mask = calc_clasp(time_series=time_series.flatten(), window_size=window_size, offset=offset)
@@ -273,7 +276,6 @@ def extract_clasp_cps_from_multivariate_ts(time_series, window_size, n_change_po
             profile, knn_mask = calc_clasp(time_series=time_series[:,i].flatten(), window_size=window_size, offset=offset)
             profile_list.append(profile)
         profile = np.mean(profile_list, axis=0).flatten()
-
 
     queue.put((-np.max(profile), (np.arange(time_series.shape[0]).tolist(), np.argmax(profile))))
 
@@ -307,7 +309,6 @@ def extract_clasp_cps_from_multivariate_ts(time_series, window_size, n_change_po
                     left_profile, _ = calc_clasp(time_series=time_series[left_range,i].flatten(), window_size=window_size, offset=offset)
                     left_profile_list.append(left_profile)
                 left_profile = np.mean(left_profile_list, axis=0)
-            # left_profile, _ = calc_clasp(time_series=time_series[left_range,1], window_size=window_size, offset=offset)
             left_change_point = np.argmax(left_profile)
             left_score = left_profile[left_change_point]
 
@@ -326,7 +327,6 @@ def extract_clasp_cps_from_multivariate_ts(time_series, window_size, n_change_po
                     right_profile, _ = calc_clasp(time_series=time_series[right_range,i].flatten(), window_size=window_size, offset=offset)
                     right_profile_list.append(right_profile)
                 right_profile = np.mean(right_profile_list, axis=0)
-            # right_profile, _ = calc_clasp(time_series=time_series[right_range,1], window_size=window_size, offset=offset)
             right_change_point =  np.argmax(right_profile)
             right_score = right_profile[right_change_point]
 
