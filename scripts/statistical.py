@@ -63,6 +63,8 @@ def UCR_SEG():
     f_list = os.listdir(dataset_path)
     max_len = 0
     min_len = 100000
+    min_num_states = 100
+    max_num_states = 0
     for fname in f_list:
         info_list = fname[:-4].split('_')
         f = info_list[0]
@@ -74,18 +76,26 @@ def UCR_SEG():
         seg_info[len_of_file(dataset_path+fname)]=i
         groundtruth = seg_to_label(seg_info)[:-1]
         length = len_of_file(dataset_path+fname)
+        n_states = len(seg_info)
         if length > max_len:
             max_len = length
         if length < min_len:
             min_len = length
+            
+        if n_states > max_num_states:
+            max_num_states = n_states
+        if n_states < min_num_states:
+            min_num_states = n_states
+
         state_num = len(set(groundtruth))
         print('length: %d, state_num: %d'%(length, state_num))
         len_list.append(length)
         state_num_list.append(state_num)
     print('AVG ---- length: %f, state_num: %f, total: %d'%(np.mean(len_list), np.mean(state_num_list), len(f_list)))
     print('MAX length: %d, MIN length: %d, total: %d'%(max_len, min_len, len(f_list)))
+    print('MAX num states: %d, MIN num states: %d'%(max_num_states, min_num_states))
 
-PAMAP2()
+# PAMAP2()
 # MoCap()
-# UCR_SEG()
+UCR_SEG()
 # exp_on_ActRecTut()
