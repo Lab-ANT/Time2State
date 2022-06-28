@@ -94,21 +94,19 @@ def exp_on_UCR_SEG(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=Fal
         data = df.to_numpy()
         win_size=3
         num_state=len(seg_info)
-        ticc = TICC(window_size=win_size, number_of_clusters=num_state, lambda_parameter=lambda_parameter, beta=beta, maxIters=3, threshold=threshold,
+        ticc = TICC(window_size=win_size, number_of_clusters=num_state, lambda_parameter=lambda_parameter, beta=beta, maxIters=100, threshold=threshold,
                 write_out_file=False, prefix_string="output_folder/", num_proc=1)
         prediction, _ = ticc.fit_transform(data)
         prediction = prediction.astype(int)
         groundtruth = seg_to_label(seg_info)[win_size:]
-        f1, precision, recall, ari, ami = evaluation(groundtruth, prediction)
-        score_list.append(np.array([f1, precision, recall, ari, ami]))
+        ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
+        score_list.append(np.array([ari, anmi, nmi]))
         if verbose:
-            print('ID: %s, F1: %f, Precision: %f, Recall: %f,  ARI: %f, AMI: %f' %(fname, f1, precision, recall, ari, ami))
+            print('ID: %d, ARI: %f, ANMI: %f, NMI: %f' %(i, ari, anmi, nmi))
     score_list = np.vstack(score_list)
-    print('AVG ---- F1: %f, Precision: %f, Recall: %f,  ARI: %f, AMI: %f' %(np.mean(score_list[:,0])\
+    print('AVG ---- ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list[:,0])\
         ,np.mean(score_list[:,1])
-        ,np.mean(score_list[:,2])
-        ,np.mean(score_list[:,3])
-        ,np.mean(score_list[:,4])))
+        ,np.mean(score_list[:,2])))
 
 def fill_nan(data):
     x_len, y_len = data.shape
@@ -262,10 +260,10 @@ def run_exp():
                 print('beta: %d, lambda_parameter: %f, threshold: %f' %(beta, lambda_parameter, threshold))
                 time_start=time.time()
                 # exp_on_PAMAP2(beta, lambda_parameter, threshold, verbose=True)
-                exp_on_synthetic(beta, lambda_parameter, threshold, verbose=False)
+                # exp_on_synthetic(beta, lambda_parameter, threshold, verbose=False)
                 # exp_on_MoCap(beta, lambda_parameter, threshold, verbose=True)
                 # exp_on_ActRecTut(beta, lambda_parameter, threshold, verbose=True)
-                # exp_on_UCR_SEG(beta, lambda_parameter, threshold)
+                exp_on_UCR_SEG(beta, lambda_parameter, threshold, verbose=False)
                 # exp_on_USC_HAD(beta, lambda_parameter, threshold, verbose=False)
                 time_end=time.time()
                 print('time',time_end-time_start)
