@@ -26,7 +26,7 @@ def  dilate_label(label, f, max_len):
     for e in label:
         # print(e)
         slice_list.append(e*np.ones(f, dtype=int))
-    print(len(slice_list))
+    # print(len(slice_list))
     return np.concatenate(slice_list)[:max_len]
 
 def evaluation_on_MoCap():
@@ -139,8 +139,38 @@ def evaluation_on_USC_HAD():
         ,np.mean(score_list[:,1])
         ,np.mean(score_list[:,2])))
 
+def evaluation_on_UCR_SEG():
+    base = os.path.join(data_path, 'UCR-SEG/UCR_datasets_seg/')
+    f_list = os.listdir(base)
+    f_list.sort()
+    score_list = []
+    for fname,n in zip(f_list, range(1,len(f_list)+1)):
+        info_list = fname[:-4].split('_')
+        f = info_list[0]
+        seg_info = {}
+        i = 0
+        for seg in info_list[2:]:
+            seg_info[int(seg)]=i
+            i+=1
+        seg_info[len_of_file(base+fname)]=i
+        groundtruth = seg_to_label(seg_info)[:]
+        if not os.path.exists(result_path+'/UCR-SEG/'+fname+'/009/segm000.txt'):
+            continue
+        prediction = np.loadtxt(result_path+'/UCR-SEG/'+fname+'/009/segm000.txt')[:,0].astype(int)    
+        prediction = dilate_label(prediction, 100, len(groundtruth))
+        ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
+        # ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
+        # f1, p, r = evaluate_cut_point(groundtruth, prediction, 200)
+        score_list.append(np.array([ari, anmi, nmi]))
+        print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(fname, ari, anmi, nmi))
+    score_list = np.vstack(score_list)
+    print('AVG ---- ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list[:,0])\
+        ,np.mean(score_list[:,1])
+        ,np.mean(score_list[:,2])))
+
 # evaluation_on_MoCap()
 # evaluation_on_synthetic()
 # evaluation_on_ActRecTut()
 # evaluation_on_PAMAP2()
-evaluation_on_USC_HAD()
+# evaluation_on_USC_HAD()
+evaluation_on_UCR_SEG()
