@@ -8,30 +8,26 @@ make
 cd ..
 
 # Configuration.
-data_source="../data/"
-INPUTDIR=$data_source"synthetic_data_for_Autoplait/"
-# INPUTDIR=$data_source"UCR-SEG/UCR_AutoPlait/"
+data_source="../../data/"
+INPUTDIR=$data_source"UCR-SEG/UCR_AutoPlait/"
 OUTDIR="output/"
 
-# outdir=$OUTDIR"_out_UCR_SEG/"
-outdir=$OUTDIR"_out_synthetic/"
+outdir=$OUTDIR"_out_UCR_SEG/"
 dblist=$INPUTDIR"list"
-n=100  # data size
-d=4  # dimension
+n=32  # data size
+d=1  # dimension
 
 rm -rf $outdir
 mkdir -p $outdir
 
 for (( i=1; i<=$n; i++ ))
 do
-  start=$(date +"%s.%N")
+  # start=$(date +"%s.%N")
   output=$outdir"dat"$i"/"
   mkdir -p $output
   input=$output"input"
   awk '{if(NR=='$i') print $0}'# $dblist > $input
   ./src/autoplait $d $input $output
-  end=$(date +"%s.%N")
-  my_array[$i]=$(timediff $start $end)
+  # end=$(date +"%s.%N")
+  # my_array[$i]=$(timediff $start $end)
 done
-
-echo "time list:"${my_array[*]}

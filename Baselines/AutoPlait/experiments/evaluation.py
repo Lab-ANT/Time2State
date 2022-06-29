@@ -153,16 +153,13 @@ def evaluation_on_UCR_SEG():
         seg_info[len_of_file(base+fname)]=i
         groundtruth = seg_to_label(seg_info)[:]
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
-        f1, p, r = evaluate_cut_point(groundtruth, prediction, 200)
-        score_list.append(np.array([ari, anmi, nmi, f1, p, r]))
-        print('ID: %s, ARI: %f, ANMI: %f, NMI: %f, F1: %f, P: %f, R: %f' %(fname, ari, anmi, nmi, f1, p, r))
+        # f1, p, r = evaluate_cut_point(groundtruth, prediction, 200)
+        score_list.append(np.array([ari, anmi, nmi]))
+        print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(fname, ari, anmi, nmi))
     score_list = np.vstack(score_list)
-    print('AVG ---- ARI: %f, ANMI: %f, NMI: %f, 1F1: %f, P: %f, R: %f' %(np.mean(score_list[:,0])\
+    print('AVG ---- ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list[:,0])\
         ,np.mean(score_list[:,1])
-        ,np.mean(score_list[:,2])
-        ,np.mean(score_list[:,3])
-        ,np.mean(score_list[:,4])
-        ,np.mean(score_list[:,5])))
+        ,np.mean(score_list[:,2])))
 
 def evaluation_on_PAMAP2():
     score_list = []
@@ -231,9 +228,9 @@ def evaluation_on_USC_HAD():
 
 # evaluation_on_ActRecTut()
 # evaluation_on_PAMAP()
-# evaluation_on_UCR_SEG()
+evaluation_on_UCR_SEG()
 # evaluation_on_synthetic()
 # evaluation_on_MoCap()
-evaluation_on_PAMAP2()
+# evaluation_on_PAMAP2()
 # evaluation_on_ActRecTut()
 # evaluation_on_USC_HAD()
