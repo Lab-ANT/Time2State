@@ -172,6 +172,34 @@ def exp_on_ActRecTut(alpha, beta, n_iter=20, verbose=False):
         ,np.mean(score_list[:,1])
         ,np.mean(score_list[:,2])))
 
+def exp_on_UCR_SEG(alpha, beta, n_iter=20, verbose=False):
+    score_list = []
+    dataset_path = os.path.join(data_path,'UCR-SEG/UCR_datasets_seg/')
+    for fname in os.listdir(dataset_path):
+        info_list = fname[:-4].split('_')
+        # f = info_list[0]
+        seg_info = {}
+        i = 0
+        for seg in info_list[2:]:
+            seg_info[int(seg)]=i
+            i+=1
+        seg_info[len_of_file(dataset_path+fname)]=i
+        df = pd.read_csv(dataset_path+fname)
+        data = df.to_numpy()
+        win_size=3
+        num_state=len(seg_info)
+        prediction = HDP_HSMM(alpha, beta, n_iter).fit(data)
+        prediction = prediction.astype(int)
+        groundtruth = seg_to_label(seg_info)[:-1]
+        ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
+        score_list.append(np.array([ari, anmi, nmi]))
+        if verbose:
+            print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(fname, ari, anmi, nmi))
+    score_list = np.vstack(score_list)
+    print('AVG ---- ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list[:,0])\
+        ,np.mean(score_list[:,1])
+        ,np.mean(score_list[:,2])))
+
 def effect_of_length():
     data = np.loadtxt(data_path+'synthetic_data_for_segmentation/test0.csv', delimiter=',')
     data = np.concatenate([data[:,:4] for x in range(15)])
@@ -210,6 +238,7 @@ def effect_of_dimension():
 # # exp_on_ActRecTut(1e4, 20, n_iter=20, verbose=True)
 # time_end=time.time()
 # print('time',time_end-time_start)
+exp_on_UCR_SEG(1e4, 20, n_iter=20, verbose=True)
 
 # effect_of_length()
-effect_of_dimension()
+# effect_of_dimension()
