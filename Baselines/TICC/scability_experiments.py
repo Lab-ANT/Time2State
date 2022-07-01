@@ -30,7 +30,7 @@ def effect_of_dimension():
         print(_data.shape)
         time_start=time.time()
         ticc = TICC(window_size=1, number_of_clusters=6, lambda_parameter=1e-3, beta=2200, maxIters=1, threshold=1e-3,
-                write_out_file=False, prefix_string="output_folder/", num_proc=1)
+                write_out_file=False, prefix_string="output_folder/", num_proc=10)
         (cluster_assignment, cluster_MRFs) = ticc.fit_transform(_data)
         time_end=time.time()
         print(time_end-time_start)

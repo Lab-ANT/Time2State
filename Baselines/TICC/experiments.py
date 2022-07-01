@@ -11,10 +11,15 @@ from TSpy.utils import *
 from TSpy.dataset import *
 import time
 
+script_path = os.path.dirname(__file__)
 # The root path of datasets.
-data_path = os.path.join(os.path.dirname(__file__), '../../data/')
+data_path = os.path.join(script_path, '../../data/')
 # Path for saving resutls.
-output_path = '../output/'
+output_path = os.path.join(script_path, 'output_TICC')
+
+def create_path(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 dataset = {'amc_86_01.4d':{'n_segs':4, 'label':{588:0,1200:1,2006:0,2530:2,3282:0,4048:3,4579:2}},
         'amc_86_02.4d':{'n_segs':8, 'label':{1009:0,1882:1,2677:2,3158:3,4688:4,5963:0,7327:5,8887:6,9632:7,10617:0}},
@@ -54,6 +59,8 @@ def exp_on_ActRecTut(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=F
 
 def exp_on_MoCap(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=False):
     base_path = os.path.join(data_path,'MoCap/4d/')
+    out_path = os.path.join(output_path,'MoCap')
+    create_path(out_path)
     score_list = []
     for fname in os.listdir(base_path):
         dataset_path = base_path+fname
@@ -61,26 +68,26 @@ def exp_on_MoCap(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=False
         data = df.to_numpy()
         n_state=dataset[fname]['n_segs']
         ticc = TICC(window_size=5, number_of_clusters=n_state, lambda_parameter=lambda_parameter, beta=beta, maxIters=10, threshold=threshold,
-                write_out_file=False, prefix_string="output_folder/", num_proc=1)
+                write_out_file=False, prefix_string="output_folder/", num_proc=10)
         prediction, _ = ticc.fit_transform(data)
-        # prediction = np.array(prediction, dtype=int)
         groundtruth = seg_to_label(dataset[fname]['label'])[:-5]
+        prediction = np.array(prediction, dtype=int)
+        result = np.vstack([groundtruth, prediction])
+        np.save(os.path.join(out_path,fname), result)
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
-        f1, p, r = evaluate_cut_point(groundtruth, prediction, 200)
-        score_list.append(np.array([ari, anmi, nmi, f1, p, r]))
+        score_list.append(np.array([ari, anmi, nmi]))
         if verbose:
-            print('ID: %s, ARI: %f, ANMI: %f, NMI: %f, F1: %f, P: %f, R: %f' %(fname, ari, anmi, nmi, f1, p, r))
+            print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(fname, ari, anmi, nmi))
     score_list = np.vstack(score_list)
-    print('AVG ---- , ARI: %f, ANMI: %f, NMI: %f, 1F1: %f, P: %f, R: %f' %(np.mean(score_list[:,0])\
+    print('AVG ---- , ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list[:,0])\
         ,np.mean(score_list[:,1])
-        ,np.mean(score_list[:,2])
-        ,np.mean(score_list[:,3])
-        ,np.mean(score_list[:,4])
-        ,np.mean(score_list[:,5])))
+        ,np.mean(score_list[:,2])))
 
 def exp_on_UCR_SEG(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=False):
     score_list = []
     dataset_path = os.path.join(data_path,'UCR-SEG/UCR_datasets_seg/')
+    out_path = os.path.join(output_path,'UCR-SEG')
+    create_path(out_path)
     for fname in os.listdir(dataset_path):
         info_list = fname[:-4].split('_')
         # f = info_list[0]
@@ -94,15 +101,18 @@ def exp_on_UCR_SEG(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=Fal
         data = df.to_numpy()
         win_size=3
         num_state=len(seg_info)
-        ticc = TICC(window_size=win_size, number_of_clusters=num_state, lambda_parameter=lambda_parameter, beta=beta, maxIters=100, threshold=threshold,
-                write_out_file=False, prefix_string="output_folder/", num_proc=1)
+        ticc = TICC(window_size=win_size, number_of_clusters=num_state, lambda_parameter=lambda_parameter, beta=beta, maxIters=10, threshold=threshold,
+                write_out_file=False, prefix_string="output_folder/", num_proc=10)
         prediction, _ = ticc.fit_transform(data)
         prediction = prediction.astype(int)
         groundtruth = seg_to_label(seg_info)[win_size:]
+        prediction = np.array(prediction, dtype=int)
+        result = np.vstack([groundtruth, prediction])
+        np.save(os.path.join(out_path,fname[:-4]), result)
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         score_list.append(np.array([ari, anmi, nmi]))
         if verbose:
-            print('ID: %d, ARI: %f, ANMI: %f, NMI: %f' %(i, ari, anmi, nmi))
+            print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(fname, ari, anmi, nmi))
     score_list = np.vstack(score_list)
     print('AVG ---- ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list[:,0])\
         ,np.mean(score_list[:,1])
@@ -204,6 +214,8 @@ def exp_on_PAMAP(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=False
 
 def exp_on_synthetic(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=False):
     base_path = os.path.join(data_path,'synthetic_data_for_segmentation/')
+    out_path = os.path.join(output_path,'synthetic')
+    create_path(out_path)
     score_list = []
     for i in range(100):
         fname = 'test'+str(i)+'.csv'
@@ -213,24 +225,25 @@ def exp_on_synthetic(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=F
         label = df = pd.read_csv(dataset_path, usecols=[4]).to_numpy().flatten()
         n_state= len(set(label))
         ticc = TICC(window_size=5, number_of_clusters=n_state, lambda_parameter=lambda_parameter, beta=beta, maxIters=10, threshold=threshold,
-                write_out_file=False, prefix_string="output_folder/", num_proc=1)
+                write_out_file=False, prefix_string="output_folder/", num_proc=10)
         prediction, _ = ticc.fit_transform(data)
         groundtruth = label[:-4]
+        prediction = np.array(prediction, dtype=int)
+        result = np.vstack([groundtruth, prediction])
+        np.save(os.path.join(out_path,str(i)), result)
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
-        f1, p, r = evaluate_cut_point(groundtruth, prediction, 200)
-        score_list.append(np.array([ari, anmi, nmi, f1, p, r]))
+        score_list.append(np.array([ari, anmi, nmi]))
         if verbose:
-            print('ID: %d, ARI: %f, ANMI: %f, NMI: %f, F1: %f, P: %f, R: %f' %(i, ari, anmi, nmi, f1, p, r))
+            print('ID: %d, ARI: %f, ANMI: %f, NMI: %f' %(i, ari, anmi, nmi))
     score_list = np.vstack(score_list)
-    print('AVG ---- ARI: %f, ANMI: %f, NMI: %f, F1: %f, P: %f, R: %f' %(np.mean(score_list[:,0])\
+    print('AVG ---- ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list[:,0])\
         ,np.mean(score_list[:,1])
-        ,np.mean(score_list[:,2])
-        ,np.mean(score_list[:,3])
-        ,np.mean(score_list[:,4])
-        ,np.mean(score_list[:,5])))
+        ,np.mean(score_list[:,2])))
 
 def exp_on_USC_HAD(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=False):
     score_list = []
+    out_path = os.path.join(output_path,'USC-HAD')
+    create_path(out_path)
     for subject in range(1,15):
         for target in range(1,6):
             data, groundtruth = load_USC_HAD(subject, target, data_path)
@@ -261,18 +274,18 @@ def run_exp():
                 time_start=time.time()
                 # exp_on_PAMAP2(beta, lambda_parameter, threshold, verbose=True)
                 # exp_on_synthetic(beta, lambda_parameter, threshold, verbose=False)
-                # exp_on_MoCap(beta, lambda_parameter, threshold, verbose=True)
+                exp_on_MoCap(beta, lambda_parameter, threshold, verbose=True)
                 # exp_on_ActRecTut(beta, lambda_parameter, threshold, verbose=True)
-                exp_on_UCR_SEG(beta, lambda_parameter, threshold, verbose=False)
+                # exp_on_UCR_SEG(beta, lambda_parameter, threshold, verbose=False)
                 # exp_on_USC_HAD(beta, lambda_parameter, threshold, verbose=False)
                 time_end=time.time()
                 print('time',time_end-time_start)
 
 if __name__ == '__main__':
-    run_exp()
-    # exp_on_synthetic(800, 1e-3, 1e-3, verbose=True)
-    # import time
-    # start = time.time()
+    # run_exp()
+    ''' These are the best params found by us. '''
+    ''' We also found that the effect of lambda and threshold is quite trivial. '''
+    # exp_on_MoCap(2500, 1e-3, 1e-3, verbose=True)
+    # exp_on_synthetic(2500, 1e-3, 1e-3, verbose=True)
+    exp_on_UCR_SEG(500, 1e-3, 1e-3, verbose=True)
     # exp_on_PAMAP2(1000, 1e-2, 1e-2, verbose=True)
-    # end = time.time()
-    # print(end-start)
