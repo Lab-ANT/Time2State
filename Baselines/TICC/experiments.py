@@ -35,27 +35,28 @@ dataset = {'amc_86_01.4d':{'n_segs':4, 'label':{588:0,1200:1,2006:0,2530:2,3282:
 def exp_on_ActRecTut(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=False):
     score_list = []
     dir_list = ['subject1_walk', 'subject2_walk']
+    out_path = os.path.join(output_path,'ActRecTut')
+    create_path(out_path)
     for dir_name in dir_list:
         dataset_path = os.path.join(data_path, 'ActRecTut/'+dir_name+'/data.mat')
         data = scipy.io.loadmat(dataset_path)
         groundtruth = data['labels'].flatten()[:-2]
         num_state = len(set(groundtruth))
         data = data['data'][:,0:10]
-        ticc = TICC(window_size=3, number_of_clusters=num_state, lambda_parameter=lambda_parameter, beta=beta, maxIters=3, threshold=threshold,
-                    write_out_file=False, prefix_string="output_folder/", num_proc=1)
+        ticc = TICC(window_size=3, number_of_clusters=num_state, lambda_parameter=lambda_parameter, beta=beta, maxIters=10, threshold=threshold,
+                    write_out_file=False, prefix_string="output_folder/", num_proc=10)
         prediction, _ = ticc.fit_transform(data)
+        prediction = np.array(prediction, dtype=int)
+        result = np.vstack([groundtruth, prediction])
+        np.save(os.path.join(out_path,dir_name), result)
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
-        f1, p, r = evaluate_cut_point(groundtruth, prediction, 200)
-        score_list.append(np.array([ari, anmi, nmi, f1, p, r]))
+        score_list.append(np.array([ari, anmi, nmi]))
         if verbose:
-            print('ID: %s, ARI: %f, ANMI: %f, NMI: %f, F1: %f, P: %f, R: %f' %(dir_name, ari, anmi, nmi, f1, p, r))
+            print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(dir_name, ari, anmi, nmi))
     score_list = np.vstack(score_list)
-    print('AVG ---- , ARI: %f, ANMI: %f, NMI: %f, 1F1: %f, P: %f, R: %f' %(np.mean(score_list[:,0])\
+    print('AVG ---- , ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list[:,0])\
         ,np.mean(score_list[:,1])
-        ,np.mean(score_list[:,2])
-        ,np.mean(score_list[:,3])
-        ,np.mean(score_list[:,4])
-        ,np.mean(score_list[:,5])))
+        ,np.mean(score_list[:,2])))
 
 def exp_on_MoCap(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=False):
     base_path = os.path.join(data_path,'MoCap/4d/')
@@ -128,6 +129,8 @@ def fill_nan(data):
 
 def exp_on_PAMAP2(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=False):
     score_list = []
+    out_path = os.path.join(output_path,'PAMAP2')
+    create_path(out_path)
     for i in range(1,9):
         dataset_path = os.path.join(data_path,'PAMAP2/Protocol/subject10'+str(i)+'.dat')
         df = pd.read_csv(dataset_path, sep=' ', header=None)
@@ -144,13 +147,16 @@ def exp_on_PAMAP2(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=Fals
         data = np.hstack([hand_acc, chest_acc, ankle_acc])
         data = fill_nan(data)
         # down sampling.
-        data = data#[::20,:]
-        groundtruth = groundtruth#[::20]
+        data = data[::20,:]
+        groundtruth = groundtruth[::20]
         groundtruth = groundtruth[:-2]
         n_state = len(set(groundtruth))
         ticc = TICC(window_size=3, number_of_clusters=n_state, lambda_parameter=lambda_parameter, beta=beta, maxIters=3, threshold=threshold,
                 write_out_file=False, prefix_string="output_folder/", num_proc=1)
         prediction, _ = ticc.fit_transform(data)
+        prediction = np.array(prediction, dtype=int)
+        result = np.vstack([groundtruth, prediction])
+        np.save(os.path.join(out_path,str(i)), result)
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         score_list.append(np.array([ari, anmi, nmi]))
         if verbose:
@@ -160,57 +166,57 @@ def exp_on_PAMAP2(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=Fals
         ,np.mean(score_list[:,1])
         ,np.mean(score_list[:,2])))
 
-def exp_on_PAMAP(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=False):
-    score_list = []
-    # Indoor
-    for i in range(1,9):
-        dataset_path = os.path.join(data_path,'PAMAP/Indoor/subject'+str(i)+'.dat')
-        df = pd.read_csv(dataset_path, sep=' ', header=None)
-        data = df.to_numpy()
-        groundtruth = np.array(data[:,1],dtype=int)
-        # groundtruth = groundtruth[::50]
-        # hand = data[:,4:10]
-        # chest = data[:,18:24]
-        # shoe = data[:,32:38]
-        hand = data[:,4:7]
-        chest = data[:,18:21]
-        shoe = data[:,32:35]
-        data = np.hstack([hand, chest, shoe])
-        # data = data[::50,:]
-        n_state = len(set(groundtruth))
-        ticc = TICC(window_size=3, number_of_clusters=n_state, lambda_parameter=lambda_parameter, beta=beta, maxIters=3, threshold=threshold,
-                write_out_file=False, prefix_string="output_folder/", num_proc=1)
-        prediction, _ = ticc.fit_transform(data)
-        groundtruth = groundtruth[:-2]
-        f1, precision, recall = adjusted_macro_F_measure(groundtruth, prediction)
-        score_list.append(np.array([f1, precision, recall]))
-        if verbose:
-            print('ID: %s, F1: %f, Precision: %f, Recall: %f' %('Indoor'+str(i), f1, precision, recall))
-    # Outdoor
-    for i in range(2,9):
-        dataset_path = os.path.join(data_path,'PAMAP/Outdoor/subject'+str(i)+'.dat')
-        df = pd.read_csv(dataset_path, sep=' ', header=None)
-        data = df.to_numpy()
-        groundtruth = np.array(data[:,1],dtype=int)
-        hand = data[:,4:7]
-        chest = data[:,18:21]
-        shoe = data[:,32:35]
-        data = np.hstack([hand, chest, shoe])
+# def exp_on_PAMAP(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=False):
+#     score_list = []
+#     # Indoor
+#     for i in range(1,9):
+#         dataset_path = os.path.join(data_path,'PAMAP/Indoor/subject'+str(i)+'.dat')
+#         df = pd.read_csv(dataset_path, sep=' ', header=None)
+#         data = df.to_numpy()
+#         groundtruth = np.array(data[:,1],dtype=int)
+#         # groundtruth = groundtruth[::50]
+#         # hand = data[:,4:10]
+#         # chest = data[:,18:24]
+#         # shoe = data[:,32:38]
+#         hand = data[:,4:7]
+#         chest = data[:,18:21]
+#         shoe = data[:,32:35]
+#         data = np.hstack([hand, chest, shoe])
+#         # data = data[::50,:]
+#         n_state = len(set(groundtruth))
+#         ticc = TICC(window_size=3, number_of_clusters=n_state, lambda_parameter=lambda_parameter, beta=beta, maxIters=3, threshold=threshold,
+#                 write_out_file=False, prefix_string="output_folder/", num_proc=1)
+#         prediction, _ = ticc.fit_transform(data)
+#         groundtruth = groundtruth[:-2]
+#         f1, precision, recall = adjusted_macro_F_measure(groundtruth, prediction)
+#         score_list.append(np.array([f1, precision, recall]))
+#         if verbose:
+#             print('ID: %s, F1: %f, Precision: %f, Recall: %f' %('Indoor'+str(i), f1, precision, recall))
+#     # Outdoor
+#     for i in range(2,9):
+#         dataset_path = os.path.join(data_path,'PAMAP/Outdoor/subject'+str(i)+'.dat')
+#         df = pd.read_csv(dataset_path, sep=' ', header=None)
+#         data = df.to_numpy()
+#         groundtruth = np.array(data[:,1],dtype=int)
+#         hand = data[:,4:7]
+#         chest = data[:,18:21]
+#         shoe = data[:,32:35]
+#         data = np.hstack([hand, chest, shoe])
 
-        n_state = len(set(groundtruth))
-        ticc = TICC(window_size=3, number_of_clusters=n_state, lambda_parameter=lambda_parameter, beta=beta, maxIters=3, threshold=threshold,
-                write_out_file=False, prefix_string="output_folder/", num_proc=1)
-        prediction, _ = ticc.fit_transform(data)
+#         n_state = len(set(groundtruth))
+#         ticc = TICC(window_size=3, number_of_clusters=n_state, lambda_parameter=lambda_parameter, beta=beta, maxIters=3, threshold=threshold,
+#                 write_out_file=False, prefix_string="output_folder/", num_proc=1)
+#         prediction, _ = ticc.fit_transform(data)
 
-        ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
-        f1, p, r = evaluate_cut_point(groundtruth, prediction)
-        score_list.append(np.array([f1, precision, recall]))
-        if verbose:
-            print('ID: %s, F1: %f, Precision: %f, Recall: %f' %('Outdoor'+str(i), f1, precision, recall))
-    score_list = np.vstack(score_list)
-    print('AVG ---- F1: %f, Precision: %f, Recall: %f' %(np.mean(score_list[:,0])\
-        ,np.mean(score_list[:,1])
-        ,np.mean(score_list[:,2])))
+#         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
+#         f1, p, r = evaluate_cut_point(groundtruth, prediction)
+#         score_list.append(np.array([f1, precision, recall]))
+#         if verbose:
+#             print('ID: %s, F1: %f, Precision: %f, Recall: %f' %('Outdoor'+str(i), f1, precision, recall))
+#     score_list = np.vstack(score_list)
+#     print('AVG ---- F1: %f, Precision: %f, Recall: %f' %(np.mean(score_list[:,0])\
+#         ,np.mean(score_list[:,1])
+#         ,np.mean(score_list[:,2])))
 
 def exp_on_synthetic(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=False):
     base_path = os.path.join(data_path,'synthetic_data_for_segmentation/')
@@ -253,18 +259,17 @@ def exp_on_USC_HAD(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=Fal
                 write_out_file=False, prefix_string="output_folder/", num_proc=1)
             prediction, _ = ticc.fit_transform(data)
             groundtruth = groundtruth[:-2]
-            f_cut, p_cut, r_cut = evaluate_cut_point(groundtruth, prediction, 300)
+            prediction = np.array(prediction, dtype=int)
+            result = np.vstack([groundtruth, prediction])
+            np.save(os.path.join(out_path,'s%d_t%d'%(subject,target)), result)
             ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
-            score_list.append(np.array([ari, anmi, nmi, f_cut, p_cut, r_cut]))
+            score_list.append(np.array([ari, anmi, nmi]))
             if verbose:
-                print('ID: %s, ARI: %f, ANMI: %f, NMI: %f, F1: %f, P: %f, R: %f' %(str(subject)+'t'+str(target), ari, anmi, nmi, f_cut, p_cut, r_cut))
+                print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(str(subject)+'t'+str(target), ari, anmi, nmi))
     score_list = np.vstack(score_list)
-    print('AVG ---- ARI: %f, ANMI: %f, NMI: %f, F1: %f, P: %f, R: %f' %(np.mean(score_list[:,0])\
+    print('AVG ---- ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list[:,0])\
         ,np.mean(score_list[:,1])
-        ,np.mean(score_list[:,2])
-        ,np.mean(score_list[:,3])
-        ,np.mean(score_list[:,4])
-        ,np.mean(score_list[:,5])))
+        ,np.mean(score_list[:,2])))
 
 def run_exp():
     for beta in [500, 1000, 1500, 2000, 2500, 3000]:
@@ -287,5 +292,7 @@ if __name__ == '__main__':
     ''' We also found that the effect of lambda and threshold is quite trivial. '''
     # exp_on_MoCap(2500, 1e-3, 1e-3, verbose=True)
     # exp_on_synthetic(2500, 1e-3, 1e-3, verbose=True)
-    exp_on_UCR_SEG(500, 1e-3, 1e-3, verbose=True)
-    # exp_on_PAMAP2(1000, 1e-2, 1e-2, verbose=True)
+    # exp_on_UCR_SEG(500, 1e-3, 1e-3, verbose=True)
+    # exp_on_ActRecTut(3000, 1e-3, 1e-3, verbose=True)
+    # exp_on_USC_HAD(500, 1e-3, 1e-3, verbose=True)
+    exp_on_PAMAP2(3000, 1e-3, 1e-3, verbose=True)

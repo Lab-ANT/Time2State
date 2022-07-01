@@ -19,7 +19,7 @@ def evaluate(dataset='MoCap', verbose=True):
         prediction = result[1,:].flatten()
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         score_list.append(np.array([ari, anmi, nmi]))
-        print("TICC,dataset%d,%f"%(int(fname[:-4])+1,ari))
+        # print("TICC,dataset%d,%f"%(int(fname[:-4])+1,ari))
         if verbose:
             print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(fname, ari, anmi, nmi))
     score_list = np.vstack(score_list)
@@ -27,5 +27,8 @@ def evaluate(dataset='MoCap', verbose=True):
         ,np.mean(score_list[:,1])
         ,np.mean(score_list[:,2])))
 
-# evaluate(dataset='MoCap',verbose=True)
-evaluate(dataset='synthetic',verbose=False)
+evaluate(dataset='MoCap',verbose=True)
+# evaluate(dataset='synthetic',verbose=False)
+# evaluate(dataset='UCR-SEG',verbose=True)
+# evaluate(dataset='ActRecTut',verbose=True)
+# evaluate(dataset='USC-HAD',verbose=True)
