@@ -228,9 +228,9 @@ def evaluation_on_USC_HAD():
 
 # evaluation_on_ActRecTut()
 # evaluation_on_PAMAP()
-evaluation_on_UCR_SEG()
+# evaluation_on_UCR_SEG()
 # evaluation_on_synthetic()
-# evaluation_on_MoCap()
+evaluation_on_MoCap()
 # evaluation_on_PAMAP2()
 # evaluation_on_ActRecTut()
 # evaluation_on_USC_HAD()
