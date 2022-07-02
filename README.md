@@ -42,7 +42,7 @@ Download [PAMAP2](http://www.pamap.org/demo.html) and [USC-HAD](http://sipi.usc.
 
 Once the data is placed correctly, run the following script.
 ```
-python ./scripts prepare_data.py
+python ./scripts/prepare_data.py
 ```
 
 # How to Run
