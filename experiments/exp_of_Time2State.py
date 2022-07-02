@@ -14,8 +14,13 @@ from Time2State.adapers import *
 from Time2State.clustering import *
 from Time2State.default_params import *
 
-data_path = os.path.join(os.path.dirname(__file__), '../data/')
-output_path = os.path.join(os.path.dirname(__file__), '../output/')
+script_path = os.path.dirname(__file__)
+data_path = os.path.join(script_path, '../data/')
+output_path = os.path.join(script_path, '../results/output_Time2State')
+
+def create_path(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 dataset_info = {'amc_86_01.4d':{'n_segs':4, 'label':{588:0,1200:1,2006:0,2530:2,3282:0,4048:3,4579:2}},
         'amc_86_02.4d':{'n_segs':8, 'label':{1009:0,1882:1,2677:2,3158:3,4688:4,5963:0,7327:5,8887:6,9632:7,10617:0}},
@@ -30,8 +35,8 @@ dataset_info = {'amc_86_01.4d':{'n_segs':4, 'label':{588:0,1200:1,2006:0,2530:2,
 
 def exp_on_UCR_SEG(win_size, step, verbose=False):
     score_list = []
-    params_Triplet['in_channels'] = 1
-    params_Triplet['compared_length'] = win_size
+    out_path = os.path.join(output_path,'UCR-SEG')
+    create_path(out_path)
     params_LSE['in_channels'] = 1
     params_LSE['M'] = 10
     params_LSE['N'] = 4
@@ -62,6 +67,9 @@ def exp_on_UCR_SEG(win_size, step, verbose=False):
         groundtruth = seg_to_label(seg_info)[:-1]
         prediction = t2s.state_seq
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
+        prediction = np.array(prediction, dtype=int)
+        result = np.vstack([groundtruth, prediction])
+        np.save(os.path.join(out_path,fname[:-4]), result)
         score_list.append(np.array([ari, anmi, nmi]))
         plot_mulvariate_time_series_and_label_v2(data,groundtruth,prediction)
         plt.savefig('1.png')
@@ -74,6 +82,8 @@ def exp_on_UCR_SEG(win_size, step, verbose=False):
 
 def exp_on_MoCap(win_size, step, verbose=False):
     base_path = os.path.join(data_path,'MoCap/4d/')
+    out_path = os.path.join(output_path,'MoCap')
+    create_path(out_path)
     score_list = []
     params_LSE['in_channels'] = 4
     params_LSE['compared_length'] = win_size
@@ -105,8 +115,9 @@ def exp_on_MoCap(win_size, step, verbose=False):
         # t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), KMeansClustering(n_state)).fit(data, win_size, step)
         # t2s = Time2State(win_size, step, CausalConv_TNC_Adaper(params_TNC), DPGMM(None)).fit(data, win_size, step)
         prediction = t2s.state_seq
-        # print(t2s.embeddings.shape)
-
+        prediction = np.array(prediction, dtype=int)
+        result = np.vstack([groundtruth, prediction])
+        np.save(os.path.join(out_path,fname), result)
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         # print(acc(groundtruth, prediction))
         # v_list = calculate_scalar_velocity_list(t2s.embeddings)
@@ -128,6 +139,8 @@ def exp_on_MoCap(win_size, step, verbose=False):
         ,np.mean(score_list[:,2])))
 
 def exp_on_synthetic(win_size=512, step=100, verbose=False):
+    out_path = os.path.join(output_path,'synthetic')
+    create_path(out_path)
     params_LSE['in_channels'] = 4
     params_LSE['compared_length'] = win_size
     params_LSE['M'] = 10
@@ -156,6 +169,9 @@ def exp_on_synthetic(win_size=512, step=100, verbose=False):
         prediction = t2s.state_seq
         t2s.set_clustering_component(KMeansClustering(5)).predict_without_encode(data, win_size, step)
         prediction2 = t2s.state_seq
+        prediction = np.array(prediction, dtype=int)
+        result = np.vstack([groundtruth, prediction])
+        np.save(os.path.join(out_path,str(i)), result)
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         ari2, anmi2, nmi2 = evaluate_clustering(groundtruth, prediction2)
         score_list.append(np.array([ari, anmi, nmi]))
@@ -247,6 +263,8 @@ def fill_nan(data):
     return data
 
 def exp_on_PAMAP2(win_size, step, verbose=False):
+    out_path = os.path.join(output_path,'PAMAP2')
+    create_path(out_path)
     params_LSE['in_channels'] = 9
     params_LSE['compared_length'] = win_size
     params_LSE['out_channels'] = 4
@@ -305,7 +323,10 @@ def exp_on_PAMAP2(win_size, step, verbose=False):
         # t2s = Time2State(win_size, step, CausalConv_TNC_Adaper(params_TNC), DPGMM(None)).fit(data, win_size, step)
         t2s.predict(data, win_size, step)
         prediction = t2s.state_seq
-        print(groundtruth.shape, prediction.shape)
+        # print(groundtruth.shape, prediction.shape)
+        prediction = np.array(prediction, dtype=int)
+        result = np.vstack([groundtruth, prediction])
+        np.save(os.path.join(out_path,'10'+str(i)), result)
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         score_list.append(np.array([ari, anmi, nmi]))
         plot_mulvariate_time_series_and_label_v2(data,groundtruth,prediction)
@@ -318,6 +339,8 @@ def exp_on_PAMAP2(win_size, step, verbose=False):
         ,np.mean(score_list[:,2])))
 
 def exp_on_USC_HAD(win_size, step, verbose=False):
+    out_path = os.path.join(output_path,'USC-HAD')
+    create_path(out_path)
     score_list = []
     score_list2 = []
     f_list = []
@@ -326,7 +349,7 @@ def exp_on_USC_HAD(win_size, step, verbose=False):
     params_LSE['M'] = 20
     params_LSE['N'] = 4
     params_LSE['nb_steps'] = 40
-    params_LSE['kernel_size'] = 5
+    params_LSE['kernel_size'] = 3
     # params_LSE['depth'] = 12
     # params_LSE['out_channels'] = 2
     params_Triplet['in_channels'] = 6
@@ -357,6 +380,9 @@ def exp_on_USC_HAD(win_size, step, verbose=False):
             # t2s.set_clustering_component(DPGMM(13)).predict_without_encode(data, win_size, step)
             t2s.set_clustering_component(DPGMM(13)).predict_without_encode(data, win_size, step)
             prediction2 = t2s.state_seq
+            prediction = np.array(prediction, dtype=int)
+            result = np.vstack([groundtruth, prediction])
+            np.save(os.path.join(out_path,'s%d_t%d'%(subject,target)), result)
             ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
             ari2, anmi2, nmi2 = evaluate_clustering(groundtruth, prediction2)
             f1, p, r = evaluate_cut_point(groundtruth, prediction2, 500)
@@ -397,11 +423,11 @@ def run_exp():
 if __name__ == '__main__':
     # run_exp()
     # time_start=time.time()
-    # exp_on_UCR_SEG(512, 50, verbose=True)
-    exp_on_MoCap(256, 50, verbose=False)
+    # exp_on_UCR_SEG(256, 50, verbose=True)
+    # exp_on_MoCap(256, 50, verbose=False)
     # exp_on_PAMAP2(512,100, verbose=True)
     # exp_on_ActRecTut(256, 50, verbose=True)
-    # exp_on_synthetic(256, 50, verbose=True)
+    exp_on_synthetic(256, 50, verbose=True)
     # exp_on_USC_HAD(256, 50, verbose=True)
     # time_end=time.time()
     # print('time',time_end-time_start)

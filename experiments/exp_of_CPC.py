@@ -13,8 +13,9 @@ from Time2State.adapers import *
 from Time2State.clustering import *
 from Time2State.default_params import *
 
-data_path = os.path.join(os.path.dirname(__file__), '../data/')
-output_path = os.path.join(os.path.dirname(__file__), '../output/result_of_Time2Seg/')
+script_path = os.path.dirname(__file__)
+data_path = os.path.join(script_path, '../data/')
+output_path = os.path.join(script_path, '../results/output_CPC')
 
 dataset_info = {'amc_86_01.4d':{'n_segs':4, 'label':{588:0,1200:1,2006:0,2530:2,3282:0,4048:3,4579:2}},
         'amc_86_02.4d':{'n_segs':8, 'label':{1009:0,1882:1,2677:2,3158:3,4688:4,5963:0,7327:5,8887:6,9632:7,10617:0}},
