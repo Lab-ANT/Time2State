@@ -28,7 +28,7 @@ def evaluate(dataset='MoCap', verbose=True):
         ,np.mean(score_list[:,2])))
 
 # evaluate(dataset='MoCap',verbose=True)
-evaluate(dataset='synthetic',verbose=False)
+# evaluate(dataset='synthetic',verbose=False)
 # evaluate(dataset='UCR-SEG',verbose=True)
 # evaluate(dataset='ActRecTut',verbose=True)
-# evaluate(dataset='USC-HAD',verbose=True)
+evaluate(dataset='USC-HAD',verbose=True)

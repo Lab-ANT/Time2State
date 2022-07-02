@@ -75,7 +75,7 @@ def evaluation_on_synthetic():
         groundtruth = np.loadtxt(data_path+'/synthetic_data_for_segmentation/test'+str(i)+'.csv', delimiter=',')[:,4].astype(int)    
         prediction = np.loadtxt(result_path+'/synthetic/test'+str(i)+'/001/segm000.txt')[:,0].astype(int)    
         prediction = dilate_label(prediction, 100, len(groundtruth))
-        print(set(prediction))
+        # print(set(prediction))
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         score_list.append(np.array([ari, anmi, nmi]))
         # plt.subplot(211)
@@ -85,7 +85,8 @@ def evaluation_on_synthetic():
         # plt.imshow(prediction.reshape(1, -1), aspect='auto', cmap='tab10',
         #   interpolation='nearest')
         # plt.savefig(str(i)+'.png')
-        print('ID: %d, ARI: %f, ANMI: %f, NMI: %f' %(i, ari, anmi, nmi))
+        print('HVGH,dataset%d,%f'%(i+1,ari))
+        # print('ID: %d, ARI: %f, ANMI: %f, NMI: %f' %(i, ari, anmi, nmi))
     score_list = np.vstack(score_list)
     print('AVG ---- ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list[:,0])\
         ,np.mean(score_list[:,1])
@@ -168,9 +169,9 @@ def evaluation_on_UCR_SEG():
         ,np.mean(score_list[:,1])
         ,np.mean(score_list[:,2])))
 
-# evaluation_on_MoCap()
+evaluation_on_MoCap()
 # evaluation_on_synthetic()
 # evaluation_on_ActRecTut()
 # evaluation_on_PAMAP2()
 # evaluation_on_USC_HAD()
-evaluation_on_UCR_SEG()
+# evaluation_on_UCR_SEG()

@@ -89,7 +89,9 @@ def exp_on_MoCap(win_size, step, verbose=False):
     params_CPC['win_size'] = win_size
     params_CPC['nb_steps'] = 20
     # time2seg = Time2Seg(win_size, step, CausalConvEncoder(hyperparameters), DPGMM(None))
-    for fname in os.listdir(base_path):
+    f_list = os.listdir(base_path)
+    f_list.sort()
+    for idx, fname in enumerate(f_list):
         dataset_path = base_path+fname
         df = pd.read_csv(dataset_path, sep=' ',usecols=range(0,4))
         data = df.to_numpy()
@@ -117,6 +119,7 @@ def exp_on_MoCap(win_size, step, verbose=False):
         # embedding_space(t2s.embeddings, show=True, s=5, label=t2s.embedding_label)
         score_list.append(np.array([ari, anmi, nmi]))
          # plot_mulvariate_time_series_and_label(data[0].T, label=prediction, groundtruth=groundtruth)
+        print('Time2State,%d,%f'%(idx,ari))
         if verbose:
             print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(fname, ari, anmi, nmi))
     score_list = np.vstack(score_list)
@@ -159,6 +162,7 @@ def exp_on_synthetic(win_size=512, step=100, verbose=False):
         score_list2.append(np.array([ari2, anmi2, nmi2]))
         # plot_mulvariate_time_series_and_label_v2(data,groundtruth,prediction)
         # plt.savefig('1.png')
+        # print('Time2State,%d,%f'%(i+9,ari))
         if verbose:
             print('ID: %d, ARI: %f, ANMI: %f, NMI: %f' %(i, ari, anmi, nmi))
             print('ID: %d, ARI: %f, ANMI: %f, NMI: %f' %(i, ari2, anmi2, nmi2))
@@ -394,7 +398,7 @@ if __name__ == '__main__':
     # run_exp()
     # time_start=time.time()
     # exp_on_UCR_SEG(512, 50, verbose=True)
-    exp_on_MoCap(256, 50, verbose=True)
+    exp_on_MoCap(256, 50, verbose=False)
     # exp_on_PAMAP2(512,100, verbose=True)
     # exp_on_ActRecTut(256, 50, verbose=True)
     # exp_on_synthetic(256, 50, verbose=True)
