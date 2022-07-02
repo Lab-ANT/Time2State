@@ -25,7 +25,7 @@ dataset_info = {'amc_86_01.4d':{'n_segs':4, 'label':{588:0,1200:1,2006:0,2530:2,
 
 data_path = os.path.join(os.path.dirname(__file__), '../data/')
 script_path = os.path.dirname(__file__)
-output_path = os.path.join(script_path, 'output_HDP_HSMM')
+output_path = os.path.join(script_path, '../results/output_HDP_HSMM')
 
 def create_path(path):
     if not os.path.exists(path):
@@ -149,6 +149,8 @@ def fill_nan(data):
 
 def exp_on_PAMAP2(alpha, beta, n_iter=20, verbose=False):
     score_list = []
+    out_path = os.path.join(output_path,'PAMAP2')
+    create_path(out_path)
     for i in range(1, 9):
         dataset_path = os.path.join(data_path,'PAMAP2/Protocol/subject10'+str(i)+'.dat')
         df = pd.read_csv(dataset_path, sep=' ', header=None)
@@ -162,7 +164,10 @@ def exp_on_PAMAP2(alpha, beta, n_iter=20, verbose=False):
         data = normalize(data)[::10]
         groundtruth = groundtruth[::10]
         prediction = HDP_HSMM(alpha, beta, n_iter).fit(data)
-        print(groundtruth.shape, prediction.shape)
+        # print(groundtruth.shape, prediction.shape)
+        prediction = np.array(prediction, dtype=int)
+        result = np.vstack([groundtruth, prediction])
+        np.save(os.path.join(out_path,'10'+str(i)), result)
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         score_list.append(np.array([ari, anmi, nmi]))
         if verbose:
@@ -174,6 +179,8 @@ def exp_on_PAMAP2(alpha, beta, n_iter=20, verbose=False):
 
 def exp_on_ActRecTut(alpha, beta, n_iter=20, verbose=False):
     score_list = []
+    out_path = os.path.join(output_path,'ActRecTut')
+    create_path(out_path)
     dir_list = ['subject1_walk', 'subject2_walk']
     for dir_name in dir_list:
         dataset_path = os.path.join(data_path,'ActRecTut/'+dir_name+'/data.mat')
@@ -183,6 +190,9 @@ def exp_on_ActRecTut(alpha, beta, n_iter=20, verbose=False):
         data = data['data'][:,0:10]
         prediction = HDP_HSMM(alpha, beta, n_iter).fit(data)
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
+        prediction = np.array(prediction, dtype=int)
+        result = np.vstack([groundtruth, prediction])
+        np.save(os.path.join(out_path,dir_name), result)
         score_list.append(np.array([ari, anmi, nmi]))
         if verbose:
             print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(dir_name, ari, anmi, nmi))
@@ -255,12 +265,12 @@ def effect_of_dimension():
     return np.array(time_list).round(2)
 
 # time_start=time.time()
-exp_on_synthetic(1e4, 20, n_iter=20, verbose=True)
-exp_on_MoCap(1e4, 20, n_iter=20, verbose=True)
-exp_on_USC_HAD(1e4, 20, n_iter=20, verbose=True)
-exp_on_UCR_SEG(1e4, 20, n_iter=1, verbose=True)
+# exp_on_synthetic(1e4, 20, n_iter=20, verbose=True)
+# exp_on_MoCap(1e4, 20, n_iter=20, verbose=True)
+# exp_on_USC_HAD(1e4, 20, n_iter=20, verbose=True)
+# exp_on_UCR_SEG(1e4, 20, n_iter=20, verbose=True)
 # exp_on_PAMAP2(1e4, 20, n_iter=20, verbose=True)
-# # exp_on_ActRecTut(1e4, 20, n_iter=20, verbose=True)
+exp_on_ActRecTut(1e4, 20, n_iter=20, verbose=True)
 # time_end=time.time()
 # print('time',time_end-time_start)
 

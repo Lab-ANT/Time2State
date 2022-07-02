@@ -5,7 +5,7 @@ from TSpy.utils import *
 
 script_path = os.path.dirname(__file__)
 # Path for saving resutls.
-output_path = os.path.join(script_path, 'output_HDP_HSMM')
+output_path = os.path.join(script_path, '../results/output_HDP_HSMM')
 
 def evaluate(dataset='MoCap', verbose=True):
     out_path = os.path.join(output_path,dataset)
@@ -31,4 +31,5 @@ def evaluate(dataset='MoCap', verbose=True):
 # evaluate(dataset='synthetic',verbose=False)
 # evaluate(dataset='UCR-SEG',verbose=True)
 # evaluate(dataset='ActRecTut',verbose=True)
+# evaluate(dataset='PAMAP2',verbose=True)
 evaluate(dataset='USC-HAD',verbose=True)
