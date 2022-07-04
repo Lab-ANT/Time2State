@@ -19,18 +19,18 @@ OUTDIR="output/"
 # d=1  # dimension
 
 # exp_on_synthetic
-# INPUTDIR=$data_source"synthetic_data_for_Autoplait/"
-# outdir=$OUTDIR"_out_synthetic/"
-# dblist=$INPUTDIR"list"
-# n=100  # data size
-# d=4  # dimension
+INPUTDIR=$data_source"synthetic_data_for_Autoplait/"
+outdir=$OUTDIR"_out_synthetic/"
+dblist=$INPUTDIR"list"
+n=100  # data size
+d=4  # dimension
 
 # USC-HAD
-INPUTDIR=$data_source"USC-HAD_for_AutoPlait/"
-outdir=$OUTDIR"_out_USC-HAD/"
-dblist=$INPUTDIR"list"
-n=70  # data size
-d=6  # dimension
+# INPUTDIR=$data_source"USC-HAD_for_AutoPlait/"
+# outdir=$OUTDIR"_out_USC-HAD/"
+# dblist=$INPUTDIR"list"
+# n=70  # data size
+# d=6  # dimension
 
 # exp_on_MoCap
 # INPUTDIR=$data_source"MoCap/4d/"

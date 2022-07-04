@@ -181,7 +181,7 @@ def evaluation_on_synthetic():
     base = os.path.join(data_path, 'synthetic_data_for_Autoplait/')
     f_list = os.listdir(base)
     f_list.remove('list')
-    f_list.remove('convert.py')
+    # f_list.remove('convert.py')
     f_list = np.sort(f_list)
     score_list = []
     # for fname,n in zip(f_list, range(1,len(f_list)+1)):
@@ -229,8 +229,8 @@ def evaluation_on_USC_HAD():
 # evaluation_on_ActRecTut()
 # evaluation_on_PAMAP()
 # evaluation_on_UCR_SEG()
-# evaluation_on_synthetic()
-evaluation_on_MoCap()
+evaluation_on_synthetic()
+# evaluation_on_MoCap()
 # evaluation_on_PAMAP2()
 # evaluation_on_ActRecTut()
 # evaluation_on_USC_HAD()
