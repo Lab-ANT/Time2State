@@ -1,11 +1,10 @@
-from torch import embedding
 from ts2vec import TS2Vec
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
 import sys
-sys.path.append('../')
+sys.path.append('./')
 from Time2State.clustering import *
 from TSpy.utils import *
 
@@ -45,10 +44,22 @@ class TS2VECEncoder():
     def clustering(self):
         self.__embedding_label = self.__clustering_component.fit(self.__embeddings)
 
+    @property
+    def embeddings(self):
+        return self.__embeddings
+
+    # @property
+    # def state_seq(self):
+    #     return self.__state_seq
+
+    @property
+    def embedding_label(self):
+        return self.__embedding_label
+
     def fit(self,X):
         self.train(X)
         self.clustering()
-        return self.__embedding_label
+        return self
 
     def draw(self, X):
         data = X
@@ -77,35 +88,7 @@ class TS2VECEncoder():
         print(out.shape)
         return out
 
-# t2v = TS2VECEncoder()
-
-# # df = pd.read_csv('../data/synthetic_data_for_segmentation/test0.csv', usecols=range(4), skiprows=1)
-# # df_gt = pd.read_csv('../data/synthetic_data_for_segmentation/test0.csv', usecols=[4], skiprows=1)
-# # groundtruth = df_gt.to_numpy().flatten()
-# # data = df.to_numpy()
-
-data_path = os.path.join(os.path.dirname(__file__), '../data/')
-# data, groundtruth = load_USC_HAD(1, 1, data_path)
-
-# prediction = t2v.fit(data)
-# print(prediction.shape)
-
-# result = evaluate_clustering(groundtruth, prediction)
-# print(result)
-
-
-
-# # out = t2v.draw(data)
-# # groundtruth = groundtruth[:out.shape[0]]
-# # state_set = set(groundtruth)
-
-# # for state in state_set:
-# #     idx = np.argwhere(groundtruth==state)
-# #     plt.scatter(out[idx,18],out[idx,19])
-# # plt.savefig('fig.png')
-
-# # plt.imshow(out[::100].T)
-# # plt.savefig('fig.png')
+data_path = os.path.join(os.path.dirname(__file__), '../../data/')
 
 def exp_on_USC_HAD(verbose=False):
     score_list = []
@@ -169,7 +152,21 @@ def exp_on_synthetic(verbose=False):
         groundtruth = df.to_numpy(dtype=int).flatten()
         
         t2v = TS2VECEncoder()
-        prediction = t2v.fit(data)
+        t2v.fit(data)
+        prediction = t2v.embedding_label
+
+        # print(groundtruth.shape, prediction.shape)
+        # embeddings = t2v.embeddings
+        # state_set = set(groundtruth)
+
+        # for state in state_set:
+        #     idx = np.argwhere(groundtruth==state)
+        #     plt.scatter(embeddings[idx,-2],embeddings[idx,-1])
+        # plt.savefig('fig.png')
+        # plt.close()
+
+        # plt.imshow(out[::100].T)
+        # plt.savefig('fig.png')
 
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         score_list.append(np.array([ari, anmi, nmi]))
