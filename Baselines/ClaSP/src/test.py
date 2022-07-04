@@ -14,7 +14,7 @@ from TSpy.utils import *
 from TSpy.dataset import *
 
 from src.clasp import extract_clasp_cps, extract_clasp_cps_from_multivariate_ts
-from dtw import dtw
+# from dtw import dtw
 
 import os
 from tslearn.clustering import TimeSeriesKMeans
@@ -22,6 +22,11 @@ from tslearn.clustering import TimeSeriesKMeans
 ''' Define relative path. '''
 script_path = os.path.dirname(__file__)
 data_path = os.path.join(script_path, '../../../data')
+output_path = os.path.join(script_path, '../../../results/output_ClaSP')
+
+def create_path(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 dataset_info = {'amc_86_01.4d':{'n_states':4, 'label':{588:0,1200:1,2006:0,2530:2,3282:0,4048:3,4579:2}},
         'amc_86_02.4d':{'n_states':8, 'label':{1009:0,1882:1,2677:2,3158:3,4688:4,5963:0,7327:5,8887:6,9632:7,10617:0}},
@@ -98,7 +103,9 @@ def run_clasp(X, window_size, num_cps, n_states):
     prediction = cluster_segs(X, found_cps, n_states)
     return prediction
 
-def exp_on_synthetic(verbose=False):
+def exp_on_synthetic(win_size, num_seg, verbose=False):
+    out_path = os.path.join(output_path,'synthetic2')
+    create_path(out_path)
     prefix = os.path.join(data_path, 'synthetic_data_for_segmentation/test')
     score_list = []
     for i in range(100):
@@ -107,7 +114,10 @@ def exp_on_synthetic(verbose=False):
         df = pd.read_csv(prefix+str(i)+'.csv', usecols=[4], skiprows=1)
         groundtruth = df.to_numpy(dtype=int).flatten()
 
-        prediction = run_clasp(data, 50, 20, 5)
+        prediction = run_clasp(data, win_size, num_seg, 5)
+        prediction = np.array(prediction, dtype=int)
+        result = np.vstack([groundtruth, prediction])
+        np.save(os.path.join(out_path,str(i)), result)
 
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         score_list.append(np.array([ari, anmi, nmi]))
@@ -118,7 +128,9 @@ def exp_on_synthetic(verbose=False):
         ,np.mean(score_list[:,1])
         ,np.mean(score_list[:,2])))
 
-def exp_on_ActRecTut(verbose=False):
+def exp_on_ActRecTut(win_size, num_seg, verbose=False):
+    out_path = os.path.join(output_path,'ActRecTut')
+    create_path(out_path)
     score_list = []
     dir_list = ['subject1_walk', 'subject2_walk']
     for dir_name in dir_list:
@@ -129,7 +141,10 @@ def exp_on_ActRecTut(verbose=False):
         data = data['data'][:,0:10]
         data = normalize(data)
         n_states = len(set(groundtruth))
-        prediction = run_clasp(data, 50, 20, n_states)
+        prediction = run_clasp(data, win_size, num_seg, n_states)
+        prediction = np.array(prediction, dtype=int)
+        result = np.vstack([groundtruth, prediction])
+        np.save(os.path.join(out_path,dir_name), result)
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         score_list.append(np.array([ari, anmi, nmi]))
         if verbose:
@@ -139,8 +154,10 @@ def exp_on_ActRecTut(verbose=False):
         ,np.mean(score_list[:,1])
         ,np.mean(score_list[:,2])))
 
-def exp_on_MoCap(verbose=False):
+def exp_on_MoCap(win_size, num_seg, verbose=False):
     base_path = os.path.join(data_path,'MoCap/4d/')
+    out_path = os.path.join(output_path,'MoCap')
+    create_path(out_path)
     score_list = []
     for fname in os.listdir(base_path):
         dataset_path = base_path+fname
@@ -148,9 +165,10 @@ def exp_on_MoCap(verbose=False):
         data = df.to_numpy()
         n_states=dataset_info[fname]['n_states']
         groundtruth = seg_to_label(dataset_info[fname]['label'])[:-1]
-
-        prediction = run_clasp(data, 50, 100, n_states)
-
+        prediction = run_clasp(data, win_size, num_seg, n_states)
+        prediction = np.array(prediction, dtype=int)
+        result = np.vstack([groundtruth, prediction])
+        np.save(os.path.join(out_path,fname), result)
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         score_list.append(np.array([ari, anmi, nmi]))
         if verbose:
@@ -161,6 +179,8 @@ def exp_on_MoCap(verbose=False):
         ,np.mean(score_list[:,2])))
 
 def exp_on_UCR_SEG(verbose=False):
+    out_path = os.path.join(output_path,'UCR-SEG')
+    create_path(out_path)
     score_list = []
     dataset_path = os.path.join(data_path,'UCR-SEG/UCR_datasets_seg/')
     for fname in os.listdir(dataset_path):
@@ -174,12 +194,12 @@ def exp_on_UCR_SEG(verbose=False):
             i+=1
         seg_info[len_of_file(dataset_path+fname)]=i
         groundtruth = seg_to_label(seg_info)
-        
         df = pd.read_csv(os.path.join(dataset_path,fname), header=None)
         data = df.to_numpy().flatten()
-
-        prediction = run_clasp(data, 50, 20, len(seg_info))
-
+        prediction = run_clasp(data, window_size, 40, len(seg_info))
+        prediction = np.array(prediction, dtype=int)
+        result = np.vstack([groundtruth, prediction])
+        np.save(os.path.join(out_path,fname[:-4]), result)
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         score_list.append(np.array([ari, anmi, nmi]))
         if verbose:
@@ -189,15 +209,21 @@ def exp_on_UCR_SEG(verbose=False):
         ,np.mean(score_list[:,1])
         ,np.mean(score_list[:,2])))
 
-def exp_on_USC_HAD(verbose=False):
+def exp_on_USC_HAD(win_size, num_seg, verbose=False):
+    out_path = os.path.join(output_path,'USC-HAD')
+    create_path(out_path)
     score_list = []
     for subject in range(1,15):
         for target in range(1,6):
             data, groundtruth = load_USC_HAD(subject, target, data_path)
-            data = normalize(data)
+            data = normalize(data[::4])
+            groundtruth = groundtruth[::4]
             n_states = len(set(groundtruth))
 
-            prediction = run_clasp(data, 50, 40, n_states)
+            prediction = run_clasp(data, win_size, num_seg, n_states)
+            prediction = np.array(prediction, dtype=int)
+            result = np.vstack([groundtruth, prediction])
+            np.save(os.path.join(out_path,'s%d_t%d'%(subject,target)), result)
 
             ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
             score_list.append(np.array([ari, anmi, nmi]))
@@ -216,7 +242,9 @@ def fill_nan(data):
                 data[x,y]=data[x-1,y]
     return data
 
-def exp_on_PAMAP2(verbose=False):
+def exp_on_PAMAP2(win_size, num_seg, verbose=False):
+    out_path = os.path.join(output_path,'PAMAP2')
+    create_path(out_path)
     score_list = []
     for i in range(1, 9):
         dataset_path = os.path.join(data_path,'PAMAP2/Protocol/subject10'+str(i)+'.dat')
@@ -230,10 +258,14 @@ def exp_on_PAMAP2(verbose=False):
         data = fill_nan(data)
         data = normalize(data)
         
+        groundtruth = groundtruth[::10]
         n_states = len(set(groundtruth))
-        prediction = run_clasp(data[::20], 50, 40, n_states)
+        prediction = run_clasp(data[::10], win_size, num_seg, n_states)
+        prediction = np.array(prediction, dtype=int)
+        result = np.vstack([groundtruth, prediction])
+        np.save(os.path.join(out_path,'10'+str(i)), result)
         
-        ari, anmi, nmi = evaluate_clustering(groundtruth[::20], prediction)
+        ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         score_list.append(np.array([ari, anmi, nmi]))
         if verbose:
             print('ID: %d, ARI: %f, ANMI: %f, NMI: %f' %(i, ari, anmi, nmi))
@@ -244,8 +276,8 @@ def exp_on_PAMAP2(verbose=False):
 
 if __name__ == '__main__':
     # exp_on_UCR_SEG(verbose=True)
-    # exp_on_ActRecTut(verbose=True)
-    exp_on_USC_HAD(verbose=True)
-    # exp_on_MoCap(verbose=True)
-    # exp_on_synthetic(verbose=True)
-    # exp_on_PAMAP2(verbose=True)
+    # exp_on_ActRecTut(50, 40, verbose=True)
+    # exp_on_USC_HAD(50, 40, verbose=True)
+    # exp_on_MoCap(50, 40, verbose=True)
+    # exp_on_synthetic(100, 40, verbose=True)
+    exp_on_PAMAP2(50, 40, verbose=True)
