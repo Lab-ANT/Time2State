@@ -95,7 +95,7 @@ def UCR_SEG():
     print('MAX length: %d, MIN length: %d, total: %d'%(max_len, min_len, len(f_list)))
     print('MAX num states: %d, MIN num states: %d'%(max_num_states, min_num_states))
 
-# PAMAP2()
+PAMAP2()
 # MoCap()
-UCR_SEG()
+# UCR_SEG()
 # exp_on_ActRecTut()
