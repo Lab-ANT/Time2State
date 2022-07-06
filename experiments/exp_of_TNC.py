@@ -98,11 +98,11 @@ def exp_on_MoCap(win_size, step, verbose=False):
         ,np.mean(score_list[:,2])))
 
 def exp_on_synthetic(win_size=512, step=100, verbose=False):
-    out_path = os.path.join(output_path,'synthetic')
+    out_path = os.path.join(output_path,'synthetic2')
     create_path(out_path)
     params_TNC['win_size'] = win_size
     params_TNC['in_channels'] = 4
-    prefix = os.path.join(data_path, 'synthetic_data_for_segmentation/test')
+    prefix = os.path.join(data_path, 'synthetic_data_for_segmentation2/test')
     score_list = []
     for i in range(100):
         df = pd.read_csv(prefix+str(i)+'.csv', usecols=range(4), skiprows=1)
@@ -131,37 +131,26 @@ def exp_on_ActRecTut(win_size, step, verbose=False):
     params_TNC['nb_steps'] = 10
     score_list = []
 
-    # train
-    # if True:
-    #     dataset_path = os.path.join(data_path,'ActRecTut/subject1_gesture/data.mat')
-    #     data = scipy.io.loadmat(dataset_path)
-    #     # print(data)
-    #     groundtruth = data['labels'].flatten()
-    #     groundtruth = reorder_label(groundtruth)
-    #     data = data['data'][:,0:10]
-    #     data = normalize(data, mode='channel')
-    #     # print(set(groundtruth))
-    #     # true state number is 6
-    #     t2s = Time2State(win_size, step, CausalConv_TNC_Adaper(params_TNC), DPGMM(None)).fit(data, win_size, step)
     dir_list = ['subject1_walk', 'subject2_walk']
     for dir_name in dir_list:
-        dataset_path = os.path.join(data_path,'ActRecTut/'+dir_name+'/data.mat')
-        data = scipy.io.loadmat(dataset_path)
-        groundtruth = data['labels'].flatten()
-        groundtruth = reorder_label(groundtruth)
-        data = data['data'][:,0:10]
-        data = normalize(data)
-        # true state number is 6
-        t2s = Time2State(win_size, step, CausalConv_TNC_Adaper(params_TNC), DPGMM(None)).fit(data, win_size, step)
-        t2s.predict(data, win_size, step)
-        prediction = t2s.state_seq+1
-        prediction = np.array(prediction, dtype=int)
-        result = np.vstack([groundtruth, prediction])
-        np.save(os.path.join(out_path,dir_name), result)
-        ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
-        score_list.append(np.array([ari, anmi, nmi]))
-        if verbose:
-            print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(dir_name, ari, anmi, nmi))
+        for i in range(10):
+            dataset_path = os.path.join(data_path,'ActRecTut/'+dir_name+'/data.mat')
+            data = scipy.io.loadmat(dataset_path)
+            groundtruth = data['labels'].flatten()
+            groundtruth = reorder_label(groundtruth)
+            data = data['data'][:,0:10]
+            data = normalize(data)
+            # true state number is 6
+            t2s = Time2State(win_size, step, CausalConv_TNC_Adaper(params_TNC), DPGMM(None)).fit(data, win_size, step)
+            t2s.predict(data, win_size, step)
+            prediction = t2s.state_seq+1
+            prediction = np.array(prediction, dtype=int)
+            result = np.vstack([groundtruth, prediction])
+            np.save(os.path.join(out_path,dir_name+str(i)), result)
+            ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
+            score_list.append(np.array([ari, anmi, nmi]))
+            if verbose:
+                print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(dir_name, ari, anmi, nmi))
     score_list = np.vstack(score_list)
     print('AVG ---- ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list[:,0])\
         ,np.mean(score_list[:,1])
@@ -273,15 +262,15 @@ def exp_on_USC_HAD2(win_size, step, verbose=False):
         ,np.mean(score_list[:,2])))
 
 if __name__ == '__main__':
-    print("Results of TNC on MoCap")
-    exp_on_MoCap(256, 50, verbose=True)
-    print("Results of TNC on PAMAP2")
-    exp_on_PAMAP2(512,100, verbose=True)
-    print("Results of TNC on ActRecTut")
-    exp_on_ActRecTut(128, 50, verbose=True)
+    # print("Results of TNC on MoCap")
+    # exp_on_MoCap(256, 50, verbose=True)
+    # print("Results of TNC on PAMAP2")
+    # exp_on_PAMAP2(512,100, verbose=True)
+    # print("Results of TNC on ActRecTut")
+    # exp_on_ActRecTut(128, 50, verbose=True)
     print("Results of TNC on synthetic")
-    exp_on_synthetic(256, 50, verbose=True)
-    print("Results of TNC on USC-HAD")
-    exp_on_USC_HAD2(256, 50, verbose=True)
-    print("Results of TNC on UCR-SEG")
-    exp_on_UCR_SEG(256, 50, verbose=True)
+    exp_on_synthetic(128, 50, verbose=True)
+    # print("Results of TNC on USC-HAD")
+    # exp_on_USC_HAD2(256, 50, verbose=True)
+    # print("Results of TNC on UCR-SEG")
+    # exp_on_UCR_SEG(256, 50, verbose=True)

@@ -38,10 +38,10 @@ def exp_on_UCR_SEG(win_size, step, verbose=False):
     out_path = os.path.join(output_path,'UCR-SEG')
     create_path(out_path)
     params_LSE['in_channels'] = 1
-    params_LSE['M'] = 20
+    params_LSE['M'] = 10
     params_LSE['N'] = 4
     params_LSE['out_channels'] = 2
-    params_LSE['nb_steps'] = 20
+    params_LSE['nb_steps'] = 40
     params_LSE['compared_length'] = win_size
     params_LSE['kernel_size'] = 5
     dataset_path = os.path.join(data_path,'UCR-SEG/UCR_datasets_seg/')
@@ -130,7 +130,7 @@ def exp_on_MoCap(win_size, step, verbose=False):
         # embedding_space(t2s.embeddings, show=True, s=5, label=t2s.embedding_label)
         score_list.append(np.array([ari, anmi, nmi]))
          # plot_mulvariate_time_series_and_label(data[0].T, label=prediction, groundtruth=groundtruth)
-        print('Time2State,%d,%f'%(idx,ari))
+        # print('Time2State,%d,%f'%(idx,ari))
         if verbose:
             print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(fname, ari, anmi, nmi))
     score_list = np.vstack(score_list)
@@ -139,7 +139,7 @@ def exp_on_MoCap(win_size, step, verbose=False):
         ,np.mean(score_list[:,2])))
 
 def exp_on_synthetic(win_size=512, step=100, verbose=False):
-    out_path = os.path.join(output_path,'synthetic')
+    out_path = os.path.join(output_path,'synthetic2')
     create_path(out_path)
     params_LSE['in_channels'] = 4
     params_LSE['compared_length'] = win_size
@@ -147,14 +147,14 @@ def exp_on_synthetic(win_size=512, step=100, verbose=False):
     params_LSE['N'] = 4
     params_LSE['nb_steps'] = 20
     params_LSE['out_channels'] = 4
-    params_Triplet['in_channels'] = 4
-    params_Triplet['compared_length'] = win_size
-    params_TNC['win_size'] = win_size
-    params_TNC['in_channels'] = 4
-    params_CPC['in_channels'] = 4
-    params_CPC['win_size'] = win_size
-    params_CPC['nb_steps'] = 20
-    prefix = os.path.join(data_path, 'synthetic_data_for_segmentation/test')
+    # params_Triplet['in_channels'] = 4
+    # params_Triplet['compared_length'] = win_size
+    # params_TNC['win_size'] = win_size
+    # params_TNC['in_channels'] = 4
+    # params_CPC['in_channels'] = 4
+    # params_CPC['win_size'] = win_size
+    # params_CPC['nb_steps'] = 20
+    prefix = os.path.join(data_path, 'synthetic_data_for_segmentation2/test')
     score_list = []
     score_list2 = []
     for i in range(100):
@@ -167,29 +167,29 @@ def exp_on_synthetic(win_size=512, step=100, verbose=False):
         # t2s = Time2State(win_size, step, LSTM_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
         # t2s = Time2State(win_size, step, CausalConv_Triplet_Adaper(params_Triplet), DPGMM(None)).fit(data, win_size, step)
         prediction = t2s.state_seq
-        t2s.set_clustering_component(KMeansClustering(5)).predict_without_encode(data, win_size, step)
-        prediction2 = t2s.state_seq
+        # t2s.set_clustering_component(KMeansClustering(5)).predict_without_encode(data, win_size, step)
+        # prediction2 = t2s.state_seq
         prediction = np.array(prediction, dtype=int)
         result = np.vstack([groundtruth, prediction])
         np.save(os.path.join(out_path,str(i)), result)
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
-        ari2, anmi2, nmi2 = evaluate_clustering(groundtruth, prediction2)
+        # ari2, anmi2, nmi2 = evaluate_clustering(groundtruth, prediction2)
         score_list.append(np.array([ari, anmi, nmi]))
-        score_list2.append(np.array([ari2, anmi2, nmi2]))
+        # score_list2.append(np.array([ari2, anmi2, nmi2]))
         # plot_mulvariate_time_series_and_label_v2(data,groundtruth,prediction)
         # plt.savefig('1.png')
         # print('Time2State,%d,%f'%(i+9,ari))
         if verbose:
             print('ID: %d, ARI: %f, ANMI: %f, NMI: %f' %(i, ari, anmi, nmi))
-            print('ID: %d, ARI: %f, ANMI: %f, NMI: %f' %(i, ari2, anmi2, nmi2))
+            # print('ID: %d, ARI: %f, ANMI: %f, NMI: %f' %(i, ari2, anmi2, nmi2))
     score_list = np.vstack(score_list)
-    score_list2 = np.vstack(score_list2)
+    # score_list2 = np.vstack(score_list2)
     print('AVG ---- ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list[:,0])\
         ,np.mean(score_list[:,1])
         ,np.mean(score_list[:,2])))
-    print('AVG ---- ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list2[:,0])\
-        ,np.mean(score_list2[:,1])
-        ,np.mean(score_list2[:,2])))
+    # print('AVG ---- ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list2[:,0])\
+    #     ,np.mean(score_list2[:,1])
+    #     ,np.mean(score_list2[:,2])))
 
 def exp_on_ActRecTut(win_size, step, verbose=False):
     out_path = os.path.join(output_path,'ActRecTut')
@@ -214,24 +214,26 @@ def exp_on_ActRecTut(win_size, step, verbose=False):
     #     t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit_encoder(data)
     dir_list = ['subject1_walk', 'subject2_walk']
     for dir_name in dir_list:
-        dataset_path = os.path.join(data_path,'ActRecTut/'+dir_name+'/data.mat')
-        data = scipy.io.loadmat(dataset_path)
-        groundtruth = data['labels'].flatten()
-        groundtruth = reorder_label(groundtruth)
-        data = data['data'][:,0:10]
-        data = normalize(data)
-        # true state number is 6
-        t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
-        # t2s.predict(data, win_size, step)
-        prediction = t2s.state_seq+1
-        prediction = np.array(prediction, dtype=int)
-        result = np.vstack([groundtruth, prediction])
-        np.save(os.path.join(out_path,dir_name), result)
-        ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
-        score_list.append(np.array([ari, anmi, nmi]))
-        # plot_mulvariate_time_series_and_label_v2(data, label=prediction, groundtruth=groundtruth)
-        if verbose:
-            print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(dir_name, ari, anmi, nmi))
+        # repeat for 10 times
+        for i in range(10):
+            dataset_path = os.path.join(data_path,'ActRecTut/'+dir_name+'/data.mat')
+            data = scipy.io.loadmat(dataset_path)
+            groundtruth = data['labels'].flatten()
+            groundtruth = reorder_label(groundtruth)
+            data = data['data'][:,0:10]
+            data = normalize(data)
+            # true state number is 6
+            t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
+            # t2s.predict(data, win_size, step)
+            prediction = t2s.state_seq+1
+            prediction = np.array(prediction, dtype=int)
+            result = np.vstack([groundtruth, prediction])
+            np.save(os.path.join(out_path,dir_name+str(i)), result)
+            ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
+            score_list.append(np.array([ari, anmi, nmi]))
+            # plot_mulvariate_time_series_and_label_v2(data, label=prediction, groundtruth=groundtruth)
+            if verbose:
+                print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(dir_name, ari, anmi, nmi))
     score_list = np.vstack(score_list)
     print('AVG ---- ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list[:,0])\
         ,np.mean(score_list[:,1])
@@ -365,7 +367,7 @@ def exp_on_USC_HAD(win_size, step, verbose=False):
             prediction2 = t2s.state_seq
             prediction = np.array(prediction, dtype=int)
             result = np.vstack([groundtruth, prediction])
-            # np.save(os.path.join(out_path,'s%d_t%d'%(subject,target)), result)
+            np.save(os.path.join(out_path,'s%d_t%d'%(subject,target)), result)
             ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
             ari2, anmi2, nmi2 = evaluate_clustering(groundtruth, prediction2)
             f1, p, r = evaluate_cut_point(groundtruth, prediction2, 500)
@@ -436,11 +438,11 @@ def run_exp():
 if __name__ == '__main__':
     # run_exp()
     # time_start=time.time()
-    exp_on_UCR_SEG(256, 50, verbose=True)
+    # exp_on_UCR_SEG(256, 50, verbose=True)
     # exp_on_MoCap(256, 50, verbose=False)
     # exp_on_PAMAP2(512,100, verbose=True)
     # exp_on_ActRecTut(128, 50, verbose=True)
-    # exp_on_synthetic(256, 50, verbose=True)
+    exp_on_synthetic(128, 50, verbose=True)
     # exp_on_USC_HAD2(256, 50, verbose=True)
     # exp_on_USC_HAD(256, 50, verbose=True)
     # time_end=time.time()
