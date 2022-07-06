@@ -5,8 +5,8 @@ import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
 
-# methods = ['Time2State', 'TICC', 'HDP_HSMM', 'AutoPlait', 'ClaSP']
-methods = ['Time2State', 'TICC', 'HDP_HSMM', 'AutoPlait', 'ClaSP', 'HVGH']
+methods = ['Time2State', 'Triplet', 'TNC', 'CPC', 'TS2Vec']
+# methods = ['Time2State', 'TICC', 'HDP_HSMM', 'AutoPlait', 'ClaSP', 'HVGH']
 datasets = ['synthetic', 'MoCap', 'USC-HAD', 'UCR-SEG', 'ActRecTut', 'PAMAP2']
 
 script_path = os.path.dirname(__file__)
@@ -39,8 +39,8 @@ for dataset in datasets:
     nmi_list_of_methods = []
 
     for method in methods:
-        if not is_dataset_exist(method, dataset):
-            continue
+        # if not is_dataset_exist(method, dataset):
+        #     continue
         ari, nmi, ari_mean, nmi_mean = evaluate(dataset, method, verbose=True)
         ari_list_of_methods.append(ari)
         nmi_list_of_methods.append(nmi)
