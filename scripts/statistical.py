@@ -1,8 +1,8 @@
-from cProfile import label
 import numpy as np
 import os
 import pandas as pd
 
+import matplotlib.pyplot as plt
 from TSpy.label import seg_to_label
 from TSpy.utils import len_of_file
 from TSpy.dataset import load_USC_HAD
@@ -25,67 +25,67 @@ dataset_info = {'amc_86_01.4d':{'n_segs':4, 'label':{588:0,1200:1,2006:0,2530:2,
 def calculate_num_segs(X):
     pre = X[0]
     num_segs = 0
-    for e in X:
+    pre_cut_pos = 0
+    seg_length_list = []
+    for i, e in enumerate(X):
         if e != pre:
             num_segs+=1
             pre = e
-    return num_segs
+            seg_length = i-pre_cut_pos
+            pre_cut_pos = i
+            seg_length_list.append(seg_length)
+    return num_segs, np.array(seg_length_list)
 
-def exp_on_ActRecTut():
-    len_list = []
-    state_num_list = []
+def ActRecTut():
+    length_list = []
+    num_seg_list = []
+    all_seg_length_list = []
     dir_list = ['subject1_walk', 'subject2_walk']
     for dir_name in dir_list:
         dataset_path = os.path.join(script_path, '../data/ActRecTut/')
         f_path = dataset_path+dir_name+'/data.mat'
         data = scipy.io.loadmat(f_path)
         groundtruth = data['labels'].flatten()
-        length = data['data'].shape[0]
-        state_num = len(set(groundtruth))
-        num_segs = calculate_num_segs(groundtruth)
-        print('length: %d, state_num: %d, num segs: %s'%(length, state_num, num_segs))
-        len_list.append(length)
-        state_num_list.append(state_num)
-    print('AVG ---- length: %f, state_num: %f'%(np.mean(len_list), np.mean(state_num_list)))
+        data = data['data']
+        length = len(data)
+        num_segs, seg_length_list = calculate_num_segs(groundtruth)
+        num_segs = num_segs+1
+        all_seg_length_list.append(seg_length_list)
+        length_list.append(length)
+        num_seg_list.append(num_segs)
+    print('%d~%d, %d~%d'%(np.min(length_list), np.max(length_list), np.min(num_seg_list), np.max(num_seg_list)))
+    all_seg_length_list = np.concatenate(all_seg_length_list)
+    # print(np.sort(all_seg_length_list))
+    print('%d~%d'%(np.min(all_seg_length_list), np.max(all_seg_length_list)))
 
 def PAMAP2():
-    len_list = []
-    state_num_list = []
-    for i in range(1,10):
+    length_list = []
+    num_seg_list = []
+    all_seg_length_list = []
+    for i in range(1,9):
         dataset_path = os.path.join(script_path, '../data/PAMAP2/Protocol/subject10'+str(i)+'.dat')
         data = np.loadtxt(dataset_path)
         groundtruth = np.array(data[:,1],dtype=int)
         num_segs = calculate_num_segs(groundtruth)
         length = data.shape[0]
-        state_num = len(set(groundtruth))
-        print('length: %d, state_num: %d, seg_num: %d'%(length, state_num, num_segs))
-        len_list.append(length)
-        state_num_list.append(state_num)
-    print('AVG ---- length: %f, state_num: %f'%(np.mean(len_list), np.mean(state_num_list)))
-
-def MoCap():
-    len_list = []
-    state_num_list = [4,8,7,6,9,5,4,4,3]
-    dataset_path = os.path.join(script_path, '../data/MoCap/4d/')
-    for fname in os.listdir(dataset_path):
-        file_path = dataset_path+fname
-        data = np.loadtxt(file_path)
-        length = data.shape[0]
-        print('length: %d'%(length))
-        len_list.append(length)
-        num_segs = calculate_num_segs(seg_to_label(dataset_info[fname]['label']))
-        print(num_segs)
-    print('AVG ---- length: %f, state_num: %f'%(np.mean(len_list), np.mean(state_num_list)))
+        length = len(data)
+        num_segs, seg_length_list = calculate_num_segs(groundtruth)
+        num_segs = num_segs+1
+        all_seg_length_list.append(seg_length_list)
+        length_list.append(length)
+        num_seg_list.append(num_segs)
+        # print(num_seg_list)
+    print('%d~%d, %d~%d'%(np.min(length_list), np.max(length_list), np.min(num_seg_list), np.max(num_seg_list)))
+    all_seg_length_list = np.concatenate(all_seg_length_list)
+    all_seg_length_list = np.sort(all_seg_length_list)
+    print('%d~%d'%(np.min(all_seg_length_list[2:]), np.max(all_seg_length_list)))
 
 def UCR_SEG():
-    len_list = []
-    state_num_list = []
+    length_list = []
+    num_seg_list = []
+    all_seg_length_list = []
     dataset_path = os.path.join(script_path, '../data/UCR-SEG/UCR_datasets_seg/')
     f_list = os.listdir(dataset_path)
-    max_len = 0
-    min_len = 100000
-    min_num_states = 100
-    max_num_states = 0
     for fname in f_list:
         info_list = fname[:-4].split('_')
         f = info_list[0]
@@ -97,49 +97,79 @@ def UCR_SEG():
         seg_info[len_of_file(dataset_path+fname)]=i
         groundtruth = seg_to_label(seg_info)[:-1]
         length = len_of_file(dataset_path+fname)
-        n_states = len(seg_info)
-        if length > max_len:
-            max_len = length
-        if length < min_len:
-            min_len = length
-            
-        if n_states > max_num_states:
-            max_num_states = n_states
-        if n_states < min_num_states:
-            min_num_states = n_states
+        num_segs, seg_length_list = calculate_num_segs(groundtruth)
+        num_segs = num_segs+1
+        all_seg_length_list.append(seg_length_list)
+        length_list.append(length)
+        num_seg_list.append(num_segs)
+    print('%d~%d, %d~%d'%(np.min(length_list), np.max(length_list), np.min(num_seg_list), np.max(num_seg_list)))
+    all_seg_length_list = np.concatenate(all_seg_length_list)
+    print('%d~%d'%(np.min(all_seg_length_list), np.max(all_seg_length_list)))
 
-        state_num = len(set(groundtruth))
-        print('length: %d, state_num: %d'%(length, state_num))
-        len_list.append(length)
-        state_num_list.append(state_num)
-    print('AVG ---- length: %f, state_num: %f, total: %d'%(np.mean(len_list), np.mean(state_num_list), len(f_list)))
-    print('MAX length: %d, MIN length: %d, total: %d'%(max_len, min_len, len(f_list)))
-    print('MAX num states: %d, MIN num states: %d'%(max_num_states, min_num_states))
-
-def exp_on_USC_HAD():
+def USC_HAD():
+    length_list = []
+    num_seg_list = []
+    all_seg_length_list = []
     for subject in range(1,15):
         for target in range(1,6):
             data, groundtruth = load_USC_HAD(subject, target, data_path)
-            print(len(set(groundtruth)),calculate_num_segs(groundtruth)+1)
+            length = len(data)
+            num_segs, seg_length_list = calculate_num_segs(groundtruth)
+            num_segs = num_segs+1
+            all_seg_length_list.append(seg_length_list)
+            length_list.append(length)
+            num_seg_list.append(num_segs)
+    print('%d~%d, %d~%d'%(np.min(length_list), np.max(length_list), np.min(num_seg_list), np.max(num_seg_list)))
+    all_seg_length_list = np.concatenate(all_seg_length_list)
+    print('%d~%d'%(np.min(all_seg_length_list), np.max(all_seg_length_list)))
 
-import matplotlib.pyplot as plt
+def MoCap():
+    state_num_list = [4,8,7,6,9,5,4,4,3]
+    dataset_path = os.path.join(script_path, '../data/MoCap/4d/')
+    length_list = []
+    num_seg_list = []
+    all_seg_length_list = []
+    for fname in os.listdir(dataset_path):
+        file_path = dataset_path+fname
+        data = np.loadtxt(file_path)
+        length = len(data)
+        groundtruth = seg_to_label(dataset_info[fname]['label'])
+        num_segs, seg_length_list = calculate_num_segs(groundtruth)
+        num_segs = num_segs+1
+        all_seg_length_list.append(seg_length_list)
+        length_list.append(length)
+        num_seg_list.append(num_segs)
+    print('%d~%d, %d~%d'%(np.min(length_list), np.max(length_list), np.min(num_seg_list), np.max(num_seg_list)))
+    all_seg_length_list = np.concatenate(all_seg_length_list)
+    print('%d~%d'%(np.min(all_seg_length_list), np.max(all_seg_length_list)))
+
 def synthetic():
     prefix = os.path.join(data_path, 'synthetic_data_for_segmentation2/test')
-    score_list = []
+    length_list = []
+    num_seg_list = []
+    all_seg_length_list = []
     for i in range(100):
         df = pd.read_csv(prefix+str(i)+'.csv', usecols=range(4), skiprows=1)
         data = df.to_numpy()
         df = pd.read_csv(prefix+str(i)+'.csv', usecols=[4], skiprows=1)
         groundtruth = df.to_numpy(dtype=int).flatten()
-        print(len(data),len(set(groundtruth)),calculate_num_segs(groundtruth)+1)
+        length = len(data)
+        num_segs, seg_length_list = calculate_num_segs(groundtruth)
+        num_segs = num_segs+1
+        all_seg_length_list.append(seg_length_list)
+        length_list.append(length)
+        num_seg_list.append(num_segs)
+    print('%d~%d, %d~%d'%(np.min(length_list), np.max(length_list), np.min(num_seg_list), np.max(num_seg_list)))
+    all_seg_length_list = np.concatenate(all_seg_length_list)
+    print('%d~%d'%(np.min(all_seg_length_list), np.max(all_seg_length_list)))
         # plt.plot(data)
         # plt.step(np.arange(len(groundtruth)),groundtruth)
         # plt.savefig('2.png')
 
 
-# exp_on_USC_HAD()
-# synthetic()
-# PAMAP2()
-# MoCap()
+USC_HAD()
+synthetic()
+MoCap()
+PAMAP2()
 UCR_SEG()
-# exp_on_ActRecTut()
+ActRecTut()
