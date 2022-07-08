@@ -211,21 +211,3 @@ class CausalCNNEncoder(torch.nn.Module):
 
     def forward(self, x):
         return self.network(x)
-
-# net = CausalCNN(4, 4, 10, 20, 3)
-# out = net(torch.ones(1,4,512))
-# print(out.shape)
-# print(out)
-# # print(out)
-# squeeze_ = torch.nn.AdaptiveMaxPool1d(1)
-# out = squeeze_(out)
-# print(out.shape)
-# squeeze2 = SqueezeChannels()
-# out = squeeze2(out)
-# print(out.shape)
-# # print(out)
-
-# conv = torch.nn.Conv1d(4, 2, 3,padding=1, dilation=1)
-# data = torch.ones(1,4,64)
-# out = conv(data)
-# print(out.shape)
