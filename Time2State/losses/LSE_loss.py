@@ -69,6 +69,18 @@ class LSELoss(torch.nn.modules.loss._Loss):
                         loss1 += -torch.mean(torch.nn.functional.logsigmoid(torch.bmm(
                             embeddings[i].view(1, 1, size_representation),
                             embeddings[j].view(1, size_representation, 1))/self.tau))
+                        # loss1 += -torch.mean(torch.nn.functional.logsigmoid(torch.bmm(
+                        #     embeddings[i].unsqueeze(0).unsqueeze(0),
+                        #     embeddings[j].unsqueeze(0).unsqueeze(-1))))
+            # for i in range(N):
+            #     intra_list = []
+            #     for j in range(N):
+            #         if j==i:
+            #             continue
+            #         intra_list.append(embeddings[j].unsqueeze(-1))
+            #     intra_matrix = torch.stack(intra_list)
+            #     matrix = embeddings[i].unsqueeze(0).repeat(N-1,1,1)
+            #     loss1 += -torch.mean(torch.nn.functional.logsigmoid(torch.bmm(matrix,intra_matrix)))
             center = torch.mean(embeddings, dim=0)
             center_list.append(center)
         
@@ -80,6 +92,19 @@ class LSELoss(torch.nn.modules.loss._Loss):
                 loss2 += -torch.mean(torch.nn.functional.logsigmoid(-torch.bmm(
                     center_list[i].view(1, 1, size_representation),
                     center_list[j].view(1, size_representation, 1))/self.tau))
+                # loss2 += -torch.mean(torch.nn.functional.logsigmoid(-torch.bmm(
+                #     center_list[i].unsqueeze(0).unsqueeze(0),
+                #     center_list[j].unsqueeze(0).unsqueeze(-1))))
+        # for i in range(M):
+        #     inter_list = []
+        #     for j in range(M):
+        #         if j==i:
+        #             continue
+        #         inter_list.append(center_list[j].unsqueeze(-1))
+        #         inter_matrix = torch.stack(inter_list)
+        #     matrix = center_list[i].unsqueeze(0).repeat(M-1,1,1)
+        #     # print(matrix.size(), inter_matrix.size())
+        #     loss2 += -torch.mean(torch.nn.functional.logsigmoid(-torch.bmm(matrix,inter_matrix)))
 
         loss = loss1/(M*N*(N-1)/2) + loss2/(M*(M-1)/2)
         return loss
