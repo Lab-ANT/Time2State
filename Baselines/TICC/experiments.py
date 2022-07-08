@@ -38,21 +38,22 @@ def exp_on_ActRecTut(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=F
     out_path = os.path.join(output_path,'ActRecTut')
     create_path(out_path)
     for dir_name in dir_list:
-        dataset_path = os.path.join(data_path, 'ActRecTut/'+dir_name+'/data.mat')
-        data = scipy.io.loadmat(dataset_path)
-        groundtruth = data['labels'].flatten()[:-2]
-        num_state = len(set(groundtruth))
-        data = data['data'][:,0:10]
-        ticc = TICC(window_size=3, number_of_clusters=num_state, lambda_parameter=lambda_parameter, beta=beta, maxIters=10, threshold=threshold,
-                    write_out_file=False, prefix_string="output_folder/", num_proc=10)
-        prediction, _ = ticc.fit_transform(data)
-        prediction = np.array(prediction, dtype=int)
-        result = np.vstack([groundtruth, prediction])
-        np.save(os.path.join(out_path,dir_name), result)
-        ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
-        score_list.append(np.array([ari, anmi, nmi]))
-        if verbose:
-            print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(dir_name, ari, anmi, nmi))
+        for i in range(10):
+            dataset_path = os.path.join(data_path, 'ActRecTut/'+dir_name+'/data.mat')
+            data = scipy.io.loadmat(dataset_path)
+            groundtruth = data['labels'].flatten()[:-2]
+            num_state = len(set(groundtruth))
+            data = data['data'][:,0:10]
+            ticc = TICC(window_size=3, number_of_clusters=num_state, lambda_parameter=lambda_parameter, beta=beta, maxIters=10, threshold=threshold,
+                        write_out_file=False, prefix_string="output_folder/", num_proc=10)
+            prediction, _ = ticc.fit_transform(data)
+            prediction = np.array(prediction, dtype=int)
+            result = np.vstack([groundtruth, prediction])
+            np.save(os.path.join(out_path,dir_name+str(i)), result)
+            ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
+            score_list.append(np.array([ari, anmi, nmi]))
+            if verbose:
+                print('ID: %s, ARI: %f, ANMI: %f, NMI: %f' %(dir_name, ari, anmi, nmi))
     score_list = np.vstack(score_list)
     print('AVG ---- , ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list[:,0])\
         ,np.mean(score_list[:,1])
@@ -219,8 +220,8 @@ def exp_on_PAMAP2(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=Fals
 #         ,np.mean(score_list[:,2])))
 
 def exp_on_synthetic(beta=2200, lambda_parameter=1e-3, threshold=1e-4, verbose=False):
-    base_path = os.path.join(data_path,'synthetic_data_for_segmentation/')
-    out_path = os.path.join(output_path,'synthetic')
+    base_path = os.path.join(data_path,'synthetic_data_for_segmentation2/')
+    out_path = os.path.join(output_path,'synthetic2')
     create_path(out_path)
     score_list = []
     for i in range(100):
@@ -291,8 +292,8 @@ if __name__ == '__main__':
     ''' These are the best params found by us. '''
     ''' We also found that the effect of lambda and threshold is quite trivial. '''
     # exp_on_MoCap(2500, 1e-3, 1e-3, verbose=True)
-    # exp_on_synthetic(2500, 1e-3, 1e-3, verbose=True)
+    exp_on_synthetic(2500, 1e-3, 1e-3, verbose=True)
     # exp_on_UCR_SEG(500, 1e-3, 1e-3, verbose=True)
     # exp_on_ActRecTut(3000, 1e-3, 1e-3, verbose=True)
     # exp_on_USC_HAD(500, 1e-3, 1e-3, verbose=True)
-    exp_on_PAMAP2(3000, 1e-3, 1e-3, verbose=True)
+    # exp_on_PAMAP2(3000, 1e-3, 1e-3, verbose=True)

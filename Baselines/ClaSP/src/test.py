@@ -13,7 +13,7 @@ from TSpy.eval import evaluate_clustering
 from TSpy.utils import *
 from TSpy.dataset import *
 
-from src.clasp import extract_clasp_cps, extract_clasp_cps_from_multivariate_ts
+from src.clasp import extract_clasp_cps_from_multivariate_ts
 # from dtw import dtw
 
 import os
@@ -97,8 +97,8 @@ def cluster_segs(X, found_cps, n_states):
     result = np.hstack(seg_label_list)
     return result
 
-def run_clasp(X, window_size, num_cps, n_states):
-    profile_, found_cps, _ = extract_clasp_cps_from_multivariate_ts(X, window_size, num_cps)
+def run_clasp(X, window_size, num_cps, n_states, offset):
+    profile_, found_cps, _ = extract_clasp_cps_from_multivariate_ts(X, window_size, num_cps, offset)
     found_cps.sort()
     prediction = cluster_segs(X, found_cps, n_states)
     return prediction
@@ -106,7 +106,7 @@ def run_clasp(X, window_size, num_cps, n_states):
 def exp_on_synthetic(win_size, num_seg, verbose=False):
     out_path = os.path.join(output_path,'synthetic2')
     create_path(out_path)
-    prefix = os.path.join(data_path, 'synthetic_data_for_segmentation/test')
+    prefix = os.path.join(data_path, 'synthetic_data_for_segmentation2/test')
     score_list = []
     for i in range(100):
         df = pd.read_csv(prefix+str(i)+'.csv', usecols=range(4), skiprows=1)
@@ -178,8 +178,8 @@ def exp_on_MoCap(win_size, num_seg, verbose=False):
         ,np.mean(score_list[:,1])
         ,np.mean(score_list[:,2])))
 
-def exp_on_UCR_SEG(verbose=False):
-    out_path = os.path.join(output_path,'UCR-SEG')
+def exp_on_UCR_SEG(win_size, num_seg, offset, verbose=False):
+    out_path = os.path.join(output_path,'UCR-SEG2')
     create_path(out_path)
     score_list = []
     dataset_path = os.path.join(data_path,'UCR-SEG/UCR_datasets_seg/')
@@ -196,7 +196,7 @@ def exp_on_UCR_SEG(verbose=False):
         groundtruth = seg_to_label(seg_info)
         df = pd.read_csv(os.path.join(dataset_path,fname), header=None)
         data = df.to_numpy().flatten()
-        prediction = run_clasp(data, window_size, 40, len(seg_info))
+        prediction = run_clasp(data, window_size, num_seg, len(seg_info), offset)
         prediction = np.array(prediction, dtype=int)
         result = np.vstack([groundtruth, prediction])
         np.save(os.path.join(out_path,fname[:-4]), result)
@@ -209,18 +209,25 @@ def exp_on_UCR_SEG(verbose=False):
         ,np.mean(score_list[:,1])
         ,np.mean(score_list[:,2])))
 
-def exp_on_USC_HAD(win_size, num_seg, verbose=False):
+def exp_on_USC_HAD(win_size, num_seg, offset, verbose=False):
     out_path = os.path.join(output_path,'USC-HAD')
     create_path(out_path)
     score_list = []
     for subject in range(1,15):
         for target in range(1,6):
             data, groundtruth = load_USC_HAD(subject, target, data_path)
-            data = normalize(data[::4])
-            groundtruth = groundtruth[::4]
+            data = normalize(data)
+            data = normalize(data)
+            groundtruth = groundtruth
             n_states = len(set(groundtruth))
+            
+            # try:
+            #     prediction = run_clasp(data, win_size, num_seg, n_states, offset)
+            # except:
+            #     continue
 
-            prediction = run_clasp(data, win_size, num_seg, n_states)
+            prediction = run_clasp(data, win_size, num_seg, n_states, offset)
+
             prediction = np.array(prediction, dtype=int)
             result = np.vstack([groundtruth, prediction])
             np.save(os.path.join(out_path,'s%d_t%d'%(subject,target)), result)
@@ -275,9 +282,9 @@ def exp_on_PAMAP2(win_size, num_seg, verbose=False):
         ,np.mean(score_list[:,2])))
 
 if __name__ == '__main__':
-    # exp_on_UCR_SEG(verbose=True)
+    # exp_on_UCR_SEG(50, 40, 0.025, verbose=True)
     # exp_on_ActRecTut(50, 40, verbose=True)
-    # exp_on_USC_HAD(50, 40, verbose=True)
+    exp_on_USC_HAD(50, 40, 0.01, verbose=True)
     # exp_on_MoCap(50, 40, verbose=True)
     # exp_on_synthetic(100, 40, verbose=True)
-    exp_on_PAMAP2(50, 40, verbose=True)
+    # exp_on_PAMAP2(50, 40, verbose=True)

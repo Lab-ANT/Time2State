@@ -67,8 +67,8 @@ class HDP_HSMM:
         return posteriormodel.stateseqs[0]
 
 def exp_on_synthetic(alpha, beta, n_iter=20, verbose=False):
-    prefix = os.path.join(data_path, 'synthetic_data_for_segmentation/test')
-    out_path = os.path.join(output_path,'synthetic')
+    prefix = os.path.join(data_path, 'synthetic_data_for_segmentation2/test')
+    out_path = os.path.join(output_path,'synthetic2')
     create_path(out_path)
     score_list = []
     for i in range(100):
@@ -265,12 +265,12 @@ def effect_of_dimension():
     return np.array(time_list).round(2)
 
 # time_start=time.time()
-# exp_on_synthetic(1e4, 20, n_iter=20, verbose=True)
+exp_on_synthetic(1e4, 20, n_iter=20, verbose=True)
 # exp_on_MoCap(1e4, 20, n_iter=20, verbose=True)
 # exp_on_USC_HAD(1e4, 20, n_iter=20, verbose=True)
 # exp_on_UCR_SEG(1e4, 20, n_iter=20, verbose=True)
 # exp_on_PAMAP2(1e4, 20, n_iter=20, verbose=True)
-exp_on_ActRecTut(1e4, 20, n_iter=20, verbose=True)
+# exp_on_ActRecTut(1e4, 20, n_iter=20, verbose=True)
 # time_end=time.time()
 # print('time',time_end-time_start)
 

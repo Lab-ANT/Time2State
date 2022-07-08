@@ -200,6 +200,7 @@ def is_trivial_match(candidate, change_points, n_timepoints, exclusion_radius=.0
     for change_point in change_points:
         left_begin = max(0, change_point - exclusion_radius)
         right_end = min(n_timepoints, change_point + exclusion_radius)
+        # print(exclusion_radius,range(left_begin, right_end))
         if candidate in range(left_begin, right_end): return True
 
     return False
@@ -314,7 +315,7 @@ def extract_clasp_cps_from_multivariate_ts(time_series, window_size, n_change_po
 
             global_change_point = left_range[0] + left_change_point
 
-            if not is_trivial_match(global_change_point, change_points, time_series.shape[0], exclusion_radius=offset):
+            if not is_trivial_match(global_change_point, change_points, time_series.shape[0], exclusion_radius=.01):
                 queue.put((-left_score, [left_range, global_change_point]))
 
         # create and enqueue right local profile
@@ -332,7 +333,7 @@ def extract_clasp_cps_from_multivariate_ts(time_series, window_size, n_change_po
 
             global_change_point = right_range[0] + right_change_point
 
-            if not is_trivial_match(global_change_point, change_points, time_series.shape[0], exclusion_radius=offset):
+            if not is_trivial_match(global_change_point, change_points, time_series.shape[0], exclusion_radius=.01):
                 queue.put((-right_score, [right_range, global_change_point]))
 
     return profile, np.array(change_points), np.array(scores)
