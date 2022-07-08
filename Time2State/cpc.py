@@ -28,6 +28,7 @@ def epoch_run(data, ds_estimator, auto_regressor, encoder, device, window_size, 
     acc = 0
     for sample in data:
         rnd_t = np.random.randint(5*window_size,sample.shape[-1]-5*window_size)
+        # rnd_t = np.random.randint(window_size,sample.shape[-1]-window_size)
         sample = torch.Tensor(sample[:,max(0,(rnd_t-20*window_size)):min(sample.shape[-1], rnd_t+20*window_size)])
 
         T = sample.shape[-1]
@@ -129,8 +130,8 @@ class CausalConv_CPC():
         data = torch.tensor(data.T).unsqueeze(0)
         T = data.shape[-1]
         # print(data.shape)
-        # windowed_data = np.concatenate(np.split(data[:, :, :T // 2 * 2], 2, -1), 0)
-        windowed_data = np.concatenate([data,data])
+        windowed_data = np.concatenate(np.split(data[:, :, :T // 5 * 5], 5, -1), 0)
+        # windowed_data = np.concatenate([data,data])
 
         learn_encoder(self.encoder, windowed_data, self.window_size, self.out_channels, n_epochs=epoch, lr=self.lr, decay=1e-5,  n_size=4,
             device=device, data=None, n_cross_val=1)
