@@ -257,6 +257,7 @@ class CausalConv_LSE(BasicEncoder):
             compared_length, nb_random_samples, negative_penalty, M, N
         )
         self.optimizer = torch.optim.Adam(self.network.parameters(), lr=lr)
+        # self.scheduler = torch.optim.lr_scheduler.ExponentialLR(self.optimizer, 0.98, -1)
         self.loss_list = []
     
     def __create_network(self, in_channels, channels, depth, reduced_size,
@@ -304,20 +305,14 @@ class CausalConv_LSE(BasicEncoder):
             train_torch_dataset, batch_size=self.batch_size, shuffle=True
         )
 
-        max_score = 0
         i = 0  # Number of performed optimization steps
         epochs = 0  # Number of performed epochs
-        count = 0  # Count of number of epochs without improvement
-        # Will be true if, by enabling epoch_selection, a model was selected
-        # using cross-validation
-        found_best = False
 
         # Encoder training
         while i < self.nb_steps:
             if verbose:
                 print('Epoch: ', epochs + 1)
             for batch in train_generator:
-                # print(batch.size(2))
                 if self.cuda:
                     batch = batch.cuda(self.gpu)
                 self.optimizer.zero_grad()
@@ -329,41 +324,13 @@ class CausalConv_LSE(BasicEncoder):
                     loss = self.loss_varying(
                         batch, self.network, train, save_memory=save_memory
                     )
-                self.loss_list.append(loss.detach().cpu().numpy())
                 loss.backward()
                 self.optimizer.step()
                 i += 1
                 if i >= self.nb_steps:
                     break
+            # self.scheduler.step()
             epochs += 1
-            # Early stopping strategy
-            if self.early_stopping is not None and y is not None and (
-                ratio >= 5 and train_size >= 50
-            ):
-                # Computes the best regularization parameters
-                features = self.encode(X)
-                self.classifier = self.fit_classifier(features, y)
-                # Cross validation score
-                score = numpy.mean(sklearn.model_selection.cross_val_score(
-                    self.classifier, features, y=y, cv=5, n_jobs=5
-                ))
-                count += 1
-                # If the model is better than the previous one, update
-                if score > max_score:
-                    count = 0
-                    found_best = True
-                    max_score = score
-                    best_encoder = type(self.network)(**self.params)
-                    best_encoder.double()
-                    if self.cuda:
-                        best_encoder.cuda(self.gpu)
-                    best_encoder.load_state_dict(self.network.state_dict())
-            if count == self.early_stopping:
-                break
-
-        # If a better model was found, use it
-        if found_best:
-            self.encoder = best_encoder
 
         return self.network
 
