@@ -35,15 +35,15 @@ dataset_info = {'amc_86_01.4d':{'n_segs':4, 'label':{588:0,1200:1,2006:0,2530:2,
 
 def exp_on_UCR_SEG(win_size, step, verbose=False):
     score_list = []
-    out_path = os.path.join(output_path,'UCR-SEG')
+    out_path = os.path.join(output_path,'UCR-SEG2')
     create_path(out_path)
     params_LSE['in_channels'] = 1
     params_LSE['M'] = 10
     params_LSE['N'] = 4
     params_LSE['out_channels'] = 2
-    params_LSE['nb_steps'] = 40
+    params_LSE['nb_steps'] = 20
     params_LSE['compared_length'] = win_size
-    params_LSE['kernel_size'] = 5
+    params_LSE['kernel_size'] = 3
     dataset_path = os.path.join(data_path,'UCR-SEG/UCR_datasets_seg/')
     for fname in os.listdir(dataset_path):
         info_list = fname[:-4].split('_')
@@ -60,10 +60,6 @@ def exp_on_UCR_SEG(win_size, step, verbose=False):
         data = df.to_numpy()
         data = normalize(data)
         t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
-        # t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), KMeansClustering(num_state)).fit(data, win_size, step)
-        # t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), HDP_HSMM(None)).fit(data, win_size, step)
-        # t2s = Time2State(win_size, step, CausalConv_Triplet_Adaper(params_Triplet), DPGMM(None)).fit(data, win_size, step)
-        # t2s = Time2State(win_size, step, CausalConv_TNC_Adaper(params_TNC), DPGMM(None)).fit(data, win_size, step)
         groundtruth = seg_to_label(seg_info)[:-1]
         prediction = t2s.state_seq
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
@@ -139,7 +135,7 @@ def exp_on_MoCap(win_size, step, verbose=False):
         ,np.mean(score_list[:,2])))
 
 def exp_on_synthetic(win_size=512, step=100, verbose=False):
-    out_path = os.path.join(output_path,'synthetic2')
+    out_path = os.path.join(output_path,'synthetic3')
     create_path(out_path)
     params_LSE['in_channels'] = 4
     params_LSE['compared_length'] = win_size
@@ -147,14 +143,7 @@ def exp_on_synthetic(win_size=512, step=100, verbose=False):
     params_LSE['N'] = 4
     params_LSE['nb_steps'] = 20
     params_LSE['out_channels'] = 4
-    # params_Triplet['in_channels'] = 4
-    # params_Triplet['compared_length'] = win_size
-    # params_TNC['win_size'] = win_size
-    # params_TNC['in_channels'] = 4
-    # params_CPC['in_channels'] = 4
-    # params_CPC['win_size'] = win_size
-    # params_CPC['nb_steps'] = 20
-    prefix = os.path.join(data_path, 'synthetic_data_for_segmentation2/test')
+    prefix = os.path.join(data_path, 'synthetic_data_for_segmentation3/test')
     score_list = []
     score_list2 = []
     for i in range(100):
@@ -438,11 +427,11 @@ def run_exp():
 if __name__ == '__main__':
     # run_exp()
     # time_start=time.time()
-    # exp_on_UCR_SEG(256, 50, verbose=True)
+    exp_on_UCR_SEG(256, 50, verbose=True)
     # exp_on_MoCap(256, 50, verbose=False)
     # exp_on_PAMAP2(512,100, verbose=True)
     # exp_on_ActRecTut(128, 50, verbose=True)
-    exp_on_synthetic(128, 50, verbose=True)
+    # exp_on_synthetic(128, 50, verbose=True)
     # exp_on_USC_HAD2(256, 50, verbose=True)
     # exp_on_USC_HAD(256, 50, verbose=True)
     # time_end=time.time()

@@ -98,11 +98,11 @@ def exp_on_MoCap(win_size, step, verbose=False):
         ,np.mean(score_list[:,2])))
 
 def exp_on_synthetic(win_size=512, step=100, verbose=False):
-    out_path = os.path.join(output_path,'synthetic2')
+    out_path = os.path.join(output_path,'synthetic3')
     create_path(out_path)
     params_TNC['win_size'] = win_size
     params_TNC['in_channels'] = 4
-    prefix = os.path.join(data_path, 'synthetic_data_for_segmentation2/test')
+    prefix = os.path.join(data_path, 'synthetic_data_for_segmentation3/test')
     score_list = []
     for i in range(100):
         df = pd.read_csv(prefix+str(i)+'.csv', usecols=range(4), skiprows=1)
