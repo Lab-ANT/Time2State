@@ -1,10 +1,11 @@
-from ts2vec import TS2Vec
+# from ts2vec import TS2Vec
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
 import sys
 sys.path.append('./')
+from Baselines.ts2vec.ts2vec import TS2Vec
 from Time2State.time2state import Time2State
 from Time2State.clustering import *
 from TSpy.utils import *
@@ -290,4 +291,4 @@ def exp_on_PAMAP2(win_size, step, verbose=False):
 # exp_on_USC_HAD2(256, 50, verbose=True)
 # exp_on_MoCap(256, 50, verbose=True)
 # exp_on_UCR_SEG(256, 50, verbose=True)
-exp_on_synthetic(128, 50, verbose=True)
+# exp_on_synthetic(128, 50, verbose=True)

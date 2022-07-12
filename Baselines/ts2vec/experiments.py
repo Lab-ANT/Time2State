@@ -164,7 +164,7 @@ def exp_on_MoCap(verbose=False):
 def exp_on_synthetic(verbose=False):
     out_path = os.path.join(output_path,'synthetic')
     create_path(out_path)
-    prefix = os.path.join(data_path, 'synthetic_data_for_segmentation/test')
+    prefix = os.path.join(data_path, 'synthetic_data_for_segmentation2/test')
     score_list = []
     for i in range(100):
         df = pd.read_csv(prefix+str(i)+'.csv', usecols=range(4), skiprows=1)
@@ -177,20 +177,17 @@ def exp_on_synthetic(verbose=False):
         prediction = t2v.embedding_label
         prediction = np.array(prediction, dtype=int)
         result = np.vstack([groundtruth, prediction])
-        np.save(os.path.join(out_path,str(i)), result)
+        # np.save(os.path.join(out_path,str(i)), result)
 
         # print(groundtruth.shape, prediction.shape)
-        # embeddings = t2v.embeddings
-        # state_set = set(groundtruth)
+        embeddings = t2v.embeddings
+        state_set = set(groundtruth)
 
-        # for state in state_set:
-        #     idx = np.argwhere(groundtruth==state)
-        #     plt.scatter(embeddings[idx,-2],embeddings[idx,-1])
-        # plt.savefig('fig.png')
-        # plt.close()
-
-        # plt.imshow(out[::100].T)
-        # plt.savefig('fig.png')
+        for state in state_set:
+            idx = np.argwhere(groundtruth==state)
+            plt.scatter(embeddings[idx,-2],embeddings[idx,-1])
+        plt.savefig('fig.png')
+        plt.close()
 
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         score_list.append(np.array([ari, anmi, nmi]))
@@ -305,11 +302,11 @@ def exp_on_PAMAP2(verbose=False):
         ,np.mean(score_list[:,1])
         ,np.mean(score_list[:,2])))
 
-exp_on_ActRecTut(verbose=True)
-exp_on_UCR_SEG(verbose=True)
-exp_on_PAMAP2(verbose=True)
-exp_on_USC_HAD(verbose=True)
-exp_on_MoCap(verbose=True)
+# exp_on_ActRecTut(verbose=True)
+# exp_on_UCR_SEG(verbose=True)
+# exp_on_PAMAP2(verbose=True)
+# exp_on_USC_HAD(verbose=True)
+# exp_on_MoCap(verbose=True)
 exp_on_synthetic(verbose=True)
 
 # class TS2VECEncoder():
