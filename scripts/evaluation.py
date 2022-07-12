@@ -30,6 +30,6 @@ def evaluate(dataset='MoCap', verbose=True):
         ,np.mean(score_list[:,2])))
 
 # datasets = ['synthetic', 'MoCap', 'ActRecTut', 'PAMAP2', 'USC-HAD2', 'UCR-SEG']
-datasets = ['USC-HAD']
+datasets = ['USC-HAD2']
 for dataset in datasets:
     evaluate(dataset=dataset,verbose=False)

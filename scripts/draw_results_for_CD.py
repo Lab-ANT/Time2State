@@ -6,9 +6,9 @@ warnings.filterwarnings("ignore")
 import pandas as pd
 
 
-methods = ['Time2State', 'Triplet', 'TNC', 'CPC', 'TS2Vec']
-# methods = ['Time2State', 'TICC', 'HDP_HSMM', 'AutoPlait', 'ClaSP', 'HVGH']
-datasets = ['MoCap', 'USC-HAD', 'UCR-SEG', 'ActRecTut', 'PAMAP2']
+# methods = ['Time2State', 'Triplet', 'TNC', 'CPC', 'TS2Vec']
+methods = ['Time2State', 'TICC', 'HDP_HSMM', 'AutoPlait', 'ClaSP', 'HVGH']
+datasets = ['synthetic', 'MoCap', 'USC-HAD', 'UCR-SEG', 'ActRecTut', 'PAMAP2']
 
 script_path = os.path.dirname(__file__)
 output_path = os.path.join(script_path, '../results/output_')
@@ -44,23 +44,23 @@ for method in methods:
         ari_list, nmi_list, ari_mean, nmi_mean = evaluate(dataset, method, verbose=True)
         ari_list_of_datasets.append(ari_list)
         nmi_list_of_datasets.append(nmi_list)
-        print(dataset, method, ari_mean, nmi_mean)
+        print(dataset, method, ari_mean, nmi_mean, len(ari_list))
     ari_list_of_datasets = np.concatenate(ari_list_of_datasets)
     print(len(ari_list_of_datasets))
     results.append(ari_list_of_datasets)
+length = len(results)
 results = np.concatenate(results)
 
 list_method_name = []
 list_dataset_name = []
 
 for method in methods:
-    list_dataset_name += ['dataset'+str(i) for i in range(139)]
+    list_dataset_name += ['dataset'+str(i) for i in range(length)]
 
 for method in methods:
-    list_method_name += [method for i in range(139)]
+    list_method_name += [method for i in range(length)]
 
 data = {'classifier_name':list_method_name, 'dataset_name':list_dataset_name, 'accuracy':results}
-# print(len(list_method_name), len(list_dataset_name), len(results))
+print(len(list_method_name), len(list_dataset_name), len(results))
 df = pd.DataFrame(data)
-# print(df)
-df.to_csv(os.path.join(target_path, 'CD.csv'))
+df.to_csv(os.path.join(target_path, 'CD_methods.csv'))
