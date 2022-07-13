@@ -1,6 +1,5 @@
 import sys
 
-from torch import embedding
 sys.path.append('./')
 from Time2State.adapers import *
 from Time2State.default_params import *
@@ -8,6 +7,7 @@ from TSpy.eval import *
 import numpy as np
 import matplotlib.pyplot as plt
 from TSpy.view import *
+from Baselines.ts2vec.adaper import *
 
 result_path = os.path.join(os.path.dirname(__file__), '../output/embeddings/')
 
@@ -93,11 +93,21 @@ if not os.path.exists(os.path.join(result_path+'/embeddings_LSE.txt')):
     embeddings_LSE = adaper_LSE.encode(data, 256, 10)
     np.savetxt(os.path.join(result_path+'embeddings_LSE.txt'), embeddings_LSE)
 
+if not os.path.exists(os.path.join(result_path+'/embeddings_TS2Vec.txt')):
+    params_TS2Vec['output_dim'] = 2
+    adaper_LSE = TS2Vec_Adaper(params_TS2Vec)
+    data = np.loadtxt(file_path, delimiter=',', usecols=range(4))
+
+    adaper_LSE.fit(data)
+    embeddings_LSE = adaper_LSE.encode(data, 256, 10)
+    np.savetxt(os.path.join(result_path+'embeddings_TS2Vec.txt'), embeddings_LSE)
+
 
 embeddings_LSE = np.loadtxt(os.path.join(result_path+'/embeddings_LSE.txt'))
 embeddings_Triplet = np.loadtxt(os.path.join(result_path+'/embeddings_Triplet.txt'))
 embeddings_TNC = np.loadtxt(os.path.join(result_path+'/embeddings_TNC.txt'))
 embeddings_CPC = np.loadtxt(os.path.join(result_path+'/embeddings_CPC.txt'))
+embeddings_TS2Vec = np.loadtxt(os.path.join(result_path+'/embeddings_TS2Vec.txt'))
 
 
 # plt.style.use('classic')
@@ -128,13 +138,13 @@ embeddings_CPC = np.loadtxt(os.path.join(result_path+'/embeddings_CPC.txt'))
 # plt.tight_layout()
 # plt.show()
 
-def embedding_space22(embeddings, label=None, alpha=0.5, s=0.1, color='blue', show=False):
+def embedding_space22(embeddings, label=None, alpha=0.4, s=0.1, color='blue', show=False):
     color_list = ['b', 'r', 'g', 'purple', 'y', 'gray']
     embeddings = np.array(embeddings)
     x = embeddings[:,0]
     y = embeddings[:,1]
     plt.style.use('classic')
-    plt.grid()
+    # plt.grid()
     i = 0
     if label is not None:
         for l in set(label):
@@ -197,9 +207,14 @@ plt.subplot(grid_[6:10,0:4])
 embedding_space22(embeddings_TNC, show=False, s=.3, label=groundtruth[:len(embeddings_TNC)])
 plt.title('TNC',size=8)
 
+# plt.subplot(grid_[6:10,4:8])
+# embedding_space22(embeddings_CPC, show=False, s=.3, label=groundtruth[:len(embeddings_CPC)])
+# plt.title('CPC',size=8)
+
 plt.subplot(grid_[6:10,4:8])
-embedding_space22(embeddings_CPC, show=False, s=.3, label=groundtruth[:len(embeddings_CPC)])
-plt.title('CPC',size=8)
+embedding_space22(embeddings_TS2Vec, show=False, s=.3, label=groundtruth[:len(embeddings_TS2Vec)])
+plt.title('TS2Vec',size=8)
 
 # plt.tight_layout()
-plt.show()
+# plt.show()
+plt.savefig('example.png')
