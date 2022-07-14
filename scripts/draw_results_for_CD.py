@@ -7,7 +7,7 @@ import pandas as pd
 
 
 # methods = ['Time2State', 'Triplet', 'TNC', 'CPC', 'TS2Vec']
-methods = ['Time2State', 'TICC', 'HDP_HSMM', 'AutoPlait', 'ClaSP', 'HVGH']
+methods = ['Time2State', 'TICC', 'HDP_HSMM', 'AutoPlait', 'ClaSP']
 datasets = ['synthetic', 'MoCap', 'USC-HAD', 'UCR-SEG', 'ActRecTut', 'PAMAP2']
 
 script_path = os.path.dirname(__file__)
@@ -55,12 +55,12 @@ list_method_name = []
 list_dataset_name = []
 
 for method in methods:
-    list_dataset_name += ['dataset'+str(i) for i in range(length)]
+    list_dataset_name += ['dataset'+str(i) for i in range(221)]
 
 for method in methods:
-    list_method_name += [method for i in range(length)]
+    list_method_name += [method for i in range(221)]
 
 data = {'classifier_name':list_method_name, 'dataset_name':list_dataset_name, 'accuracy':results}
-print(len(list_method_name), len(list_dataset_name), len(results))
+print(length, len(list_method_name), len(list_dataset_name), len(results))
 df = pd.DataFrame(data)
-df.to_csv(os.path.join(target_path, 'CD_methods.csv'))
+df.to_csv(os.path.join(target_path, 'CD_methods.csv'), index=False)
