@@ -154,9 +154,9 @@ def exp_on_ActRecTut(win_size, num_seg, verbose=False):
         ,np.mean(score_list[:,1])
         ,np.mean(score_list[:,2])))
 
-def exp_on_MoCap(win_size, num_seg, verbose=False):
+def exp_on_MoCap(win_size, num_seg, offset, verbose=False):
     base_path = os.path.join(data_path,'MoCap/4d/')
-    out_path = os.path.join(output_path,'MoCap')
+    out_path = os.path.join(output_path,'MoCap2')
     create_path(out_path)
     score_list = []
     for fname in os.listdir(base_path):
@@ -165,7 +165,7 @@ def exp_on_MoCap(win_size, num_seg, verbose=False):
         data = df.to_numpy()
         n_states=dataset_info[fname]['n_states']
         groundtruth = seg_to_label(dataset_info[fname]['label'])[:-1]
-        prediction = run_clasp(data, win_size, num_seg, n_states)
+        prediction = run_clasp(data, win_size, num_seg, n_states, offset)
         prediction = np.array(prediction, dtype=int)
         result = np.vstack([groundtruth, prediction])
         np.save(os.path.join(out_path,fname), result)
@@ -210,7 +210,7 @@ def exp_on_UCR_SEG(win_size, num_seg, offset, verbose=False):
         ,np.mean(score_list[:,2])))
 
 def exp_on_USC_HAD(win_size, num_seg, offset, verbose=False):
-    out_path = os.path.join(output_path,'USC-HAD')
+    out_path = os.path.join(output_path,'USC-HAD2')
     create_path(out_path)
     score_list = []
     for subject in range(1,15):
@@ -220,11 +220,6 @@ def exp_on_USC_HAD(win_size, num_seg, offset, verbose=False):
             data = normalize(data)
             groundtruth = groundtruth
             n_states = len(set(groundtruth))
-            
-            # try:
-            #     prediction = run_clasp(data, win_size, num_seg, n_states, offset)
-            # except:
-            #     continue
 
             prediction = run_clasp(data, win_size, num_seg, n_states, offset)
 
@@ -249,7 +244,7 @@ def fill_nan(data):
                 data[x,y]=data[x-1,y]
     return data
 
-def exp_on_PAMAP2(win_size, num_seg, verbose=False):
+def exp_on_PAMAP2(win_size, num_seg, offset, verbose=False):
     out_path = os.path.join(output_path,'PAMAP2')
     create_path(out_path)
     score_list = []
@@ -267,7 +262,7 @@ def exp_on_PAMAP2(win_size, num_seg, verbose=False):
         
         groundtruth = groundtruth[::10]
         n_states = len(set(groundtruth))
-        prediction = run_clasp(data[::10], win_size, num_seg, n_states)
+        prediction = run_clasp(data[::10], win_size, num_seg, n_states, offset)
         prediction = np.array(prediction, dtype=int)
         result = np.vstack([groundtruth, prediction])
         np.save(os.path.join(out_path,'10'+str(i)), result)
@@ -282,9 +277,9 @@ def exp_on_PAMAP2(win_size, num_seg, verbose=False):
         ,np.mean(score_list[:,2])))
 
 if __name__ == '__main__':
-    # exp_on_UCR_SEG(50, 40, 0.025, verbose=True)
+    # exp_on_UCR_SEG(50, 40, 0.05, verbose=True)
     # exp_on_ActRecTut(50, 40, verbose=True)
-    exp_on_USC_HAD(50, 40, 0.01, verbose=True)
-    # exp_on_MoCap(50, 40, verbose=True)
+    exp_on_USC_HAD(50, 40, 0.02, verbose=True)
+    # exp_on_MoCap(50, 40, 0.04, verbose=True)
     # exp_on_synthetic(100, 40, verbose=True)
-    # exp_on_PAMAP2(50, 40, verbose=True)
+    # exp_on_PAMAP2(50, 40, 0.02, verbose=True)
