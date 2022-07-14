@@ -39,7 +39,7 @@ class LSELoss(torch.nn.modules.loss._Loss):
         self.M = M
         self.N = N
         # temperature parameter
-        self.tau = 1
+        self.tau = 100
         self.lambda1 = 1
 
     def forward(self, batch, encoder, train, save_memory=False):
@@ -107,4 +107,5 @@ class LSELoss(torch.nn.modules.loss._Loss):
         #     loss2 += -torch.mean(torch.nn.functional.logsigmoid(-torch.bmm(matrix,inter_matrix)))
 
         loss = loss1/(M*N*(N-1)/2) + loss2/(M*(M-1)/2)
+        # loss = loss2/(M*(M-1)/2)
         return loss
