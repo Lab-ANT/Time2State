@@ -33,6 +33,7 @@ dataset_info = {'amc_86_01.4d':{'n_segs':4, 'label':{588:0,1200:1,2006:0,2530:2,
         'amc_86_14.4d':{'n_segs':3, 'label':{671:0,1913:1,2931:0,4134:2,5051:0,5628:1,6055:2}},
 }
 
+from Baselines.ts2vec.adaper import *
 def exp_on_UCR_SEG(win_size, step, verbose=False):
     score_list = []
     out_path = os.path.join(output_path,'UCR-SEG2')
@@ -44,6 +45,8 @@ def exp_on_UCR_SEG(win_size, step, verbose=False):
     params_LSE['nb_steps'] = 20
     params_LSE['compared_length'] = win_size
     params_LSE['kernel_size'] = 3
+    params_TS2Vec['input_dim'] = 1
+    params_TS2Vec['output_dim'] = 2
     dataset_path = os.path.join(data_path,'UCR-SEG/UCR_datasets_seg/')
     for fname in os.listdir(dataset_path):
         info_list = fname[:-4].split('_')
@@ -60,6 +63,7 @@ def exp_on_UCR_SEG(win_size, step, verbose=False):
         data = df.to_numpy()
         data = normalize(data)
         t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
+        # t2s = Time2State(win_size, step, TS2Vec_Adaper(params_TS2Vec), DPGMM(None, alpha=None)).fit(data, win_size, step)
         groundtruth = seg_to_label(seg_info)[:-1]
         prediction = t2s.state_seq
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
@@ -87,13 +91,6 @@ def exp_on_MoCap(win_size, step, verbose=False):
     params_LSE['N'] = 4
     params_LSE['out_channels'] = 4
     # params_LSE['kernel_size'] = 5
-    params_Triplet['in_channels'] = 4
-    params_Triplet['compared_length'] = win_size
-    params_TNC['in_channels'] = 4
-    params_TNC['win_size'] = win_size
-    params_CPC['in_channels'] = 4
-    params_CPC['win_size'] = win_size
-    params_CPC['nb_steps'] = 20
     # time2seg = Time2Seg(win_size, step, CausalConvEncoder(hyperparameters), DPGMM(None))
     f_list = os.listdir(base_path)
     f_list.sort()
@@ -241,24 +238,16 @@ def exp_on_PAMAP2(win_size, step, verbose=False):
     create_path(out_path)
     params_LSE['in_channels'] = 9
     params_LSE['compared_length'] = win_size
-    params_LSE['out_channels'] = 4
+    params_LSE['out_channels'] = 9
     params_LSE['M'] = 20
     params_LSE['N'] = 4
     params_LSE['nb_steps'] = 40
-    params_LSE['kernel_size'] = 5
+    # params_LSE['kernel_size'] = 3
     
-    params_Triplet['in_channels'] = 9
-    params_Triplet['compared_length'] = win_size
-    params_TNC['in_channels'] = 9
-    params_TNC['win_size'] = win_size
-    params_CPC['in_channels'] = 9
-    params_CPC['win_size'] = win_size
-    params_CPC['nb_steps'] = 20
     dataset_path = os.path.join(data_path,'PAMAP2/Protocol/subject10'+str(1)+'.dat')
     df = pd.read_csv(dataset_path, sep=' ', header=None)
     data = df.to_numpy()
     groundtruth = np.array(data[:,1],dtype=int)
-    # print(set(groundtruth), len(set(groundtruth)))
     hand_acc = data[:,4:7]
     chest_acc = data[:,21:24]
     ankle_acc = data[:,38:41]
@@ -269,11 +258,7 @@ def exp_on_PAMAP2(win_size, step, verbose=False):
     data = np.hstack([hand_acc, chest_acc, ankle_acc])
     data = fill_nan(data)
     data = normalize(data)
-    # t2s = Time2State(win_size, step, CausalConv_CPC_Adaper(params_CPC), DPGMM(None)).fit(data, win_size, step)
     t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
-    # t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
-    # t2s = Time2State(win_size, step, CausalConv_TNC_Adaper(params_TNC), DPGMM(None)).fit(data, win_size, step)
-    # t2s = Time2State(win_size, step, CausalConv_Triplet_Adaper(params_Triplet), DPGMM(None)).fit(data, win_size, step)
     score_list = []
     for i in range(1, 9):
         dataset_path = os.path.join(data_path,'PAMAP2/Protocol/subject10'+str(i)+'.dat')
@@ -290,21 +275,50 @@ def exp_on_PAMAP2(win_size, step, verbose=False):
         data = np.hstack([hand_acc, chest_acc, ankle_acc])
         data = fill_nan(data)
         data = normalize(data)
-        # print(data.shape)
-        # t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
-        # t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), HDP_HSMM(None)).fit(data, win_size, step)
-        # t2s = Time2State(win_size, step, CausalConv_Triplet_Adaper(params_Triplet), DPGMM(None)).fit(data, win_size, step)
-        # t2s = Time2State(win_size, step, CausalConv_TNC_Adaper(params_TNC), DPGMM(None)).fit(data, win_size, step)
         t2s.predict(data, win_size, step)
         prediction = t2s.state_seq
-        # print(groundtruth.shape, prediction.shape)
         prediction = np.array(prediction, dtype=int)
         result = np.vstack([groundtruth, prediction])
-        np.save(os.path.join(out_path,'10'+str(i)), result)
+        # np.save(os.path.join(out_path,'10'+str(i)), result)
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
         score_list.append(np.array([ari, anmi, nmi]))
-        plot_mulvariate_time_series_and_label_v2(data,groundtruth,prediction)
-        plt.savefig('1.png')
+        # plot_mulvariate_time_series_and_label_v2(data,groundtruth,prediction)
+        # plt.savefig('1.png')
+        if verbose:
+            print('ID: %d, ARI: %f, ANMI: %f, NMI: %f' %(i, ari, anmi, nmi))
+    score_list = np.vstack(score_list)
+    print('AVG ---- ARI: %f, ANMI: %f, NMI: %f' %(np.mean(score_list[:,0])\
+        ,np.mean(score_list[:,1])
+        ,np.mean(score_list[:,2])))
+
+def exp_on_PAMAP22(win_size, step, verbose=False):
+    out_path = os.path.join(output_path,'PAMAP2')
+    create_path(out_path)
+    params_LSE['in_channels'] = 9
+    params_LSE['compared_length'] = win_size
+    params_LSE['out_channels'] = 4
+    params_LSE['M'] = 20
+    params_LSE['N'] = 4
+    params_LSE['nb_steps'] = 20
+    dataset_path = os.path.join(data_path,'PAMAP2/Protocol/subject10'+str(1)+'.dat')
+    score_list = []
+    for i in range(1, 9):
+        dataset_path = os.path.join(data_path,'PAMAP2/Protocol/subject10'+str(i)+'.dat')
+        df = pd.read_csv(dataset_path, sep=' ', header=None)
+        data = df.to_numpy()
+        groundtruth = np.array(data[:,1],dtype=int)
+        hand_acc = data[:,4:7]
+        chest_acc = data[:,21:24]
+        ankle_acc = data[:,38:41]
+        data = np.hstack([hand_acc, chest_acc, ankle_acc])
+        data = fill_nan(data)
+        data = normalize(data)
+        t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
+        prediction = t2s.state_seq
+        prediction = np.array(prediction, dtype=int)
+        result = np.vstack([groundtruth, prediction])
+        ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
+        score_list.append(np.array([ari, anmi, nmi]))
         if verbose:
             print('ID: %d, ARI: %f, ANMI: %f, NMI: %f' %(i, ari, anmi, nmi))
     score_list = np.vstack(score_list)
@@ -427,9 +441,9 @@ def run_exp():
 if __name__ == '__main__':
     # run_exp()
     # time_start=time.time()
-    exp_on_UCR_SEG(256, 50, verbose=True)
+    # exp_on_UCR_SEG(256, 50, verbose=True)
     # exp_on_MoCap(256, 50, verbose=False)
-    # exp_on_PAMAP2(512,100, verbose=True)
+    exp_on_PAMAP22(512,100, verbose=True)
     # exp_on_ActRecTut(128, 50, verbose=True)
     # exp_on_synthetic(128, 50, verbose=True)
     # exp_on_USC_HAD2(256, 50, verbose=True)
