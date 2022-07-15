@@ -24,8 +24,9 @@ import networkx
 import os 
 script_path = os.path.dirname(__file__)
 result_path = os.path.join(script_path, '../results')
-result_file_path = os.path.join(result_path, 'CD.csv')
-out_file_name = 'CD.png'
+# result_file_path = os.path.join(result_path, 'CD.csv')
+result_file_path = os.path.join(result_path, 'CD_methods.csv')
+out_file_name = 'CD.eps'
 
 # inspired from orange3 https://docs.orange.biolab.si/3/data-mining-library/reference/evaluation.cd.html
 def graph_ranks(avranks, names, p_values, cd=None, cdmethod=None, lowv=None, highv=None,
@@ -386,4 +387,4 @@ def wilcoxon_holm(alpha=0.05, df_perf=None):
 
 df_perf = pd.read_csv(result_file_path, index_col=False) # 在这里更改要读取的csv的文件位置
 
-draw_cd_diagram(df_perf=df_perf, title='Accuracy', labels=True)
+draw_cd_diagram(df_perf=df_perf, title='Rank', labels=True)
