@@ -36,7 +36,7 @@ dataset_info = {'amc_86_01.4d':{'n_segs':4, 'label':{588:0,1200:1,2006:0,2530:2,
 from Baselines.ts2vec.adaper import *
 def exp_on_UCR_SEG(win_size, step, verbose=False):
     score_list = []
-    out_path = os.path.join(output_path,'UCR-SEG2')
+    out_path = os.path.join(output_path,'UCR-SEG3')
     create_path(out_path)
     params_LSE['in_channels'] = 1
     params_LSE['M'] = 10
@@ -396,7 +396,7 @@ def exp_on_USC_HAD(win_size, step, verbose=False):
 
 def exp_on_USC_HAD2(win_size, step, verbose=False):
     score_list = []
-    out_path = os.path.join(output_path,'USC-HAD')
+    out_path = os.path.join(output_path,'USC-HAD2')
     create_path(out_path)
     params_LSE['in_channels'] = 6
     params_LSE['compared_length'] = win_size
@@ -443,8 +443,8 @@ if __name__ == '__main__':
     # time_start=time.time()
     # exp_on_UCR_SEG(256, 50, verbose=True)
     # exp_on_MoCap(256, 50, verbose=False)
-    exp_on_PAMAP22(512,100, verbose=True)
-    # exp_on_ActRecTut(128, 50, verbose=True)
+    # exp_on_PAMAP22(512,100, verbose=True)
+    exp_on_ActRecTut(128, 50, verbose=True)
     # exp_on_synthetic(128, 50, verbose=True)
     # exp_on_USC_HAD2(256, 50, verbose=True)
     # exp_on_USC_HAD(256, 50, verbose=True)
