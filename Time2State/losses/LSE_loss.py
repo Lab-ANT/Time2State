@@ -39,8 +39,8 @@ class LSELoss(torch.nn.modules.loss._Loss):
         self.M = M
         self.N = N
         # temperature parameter
-        self.tau = 100
-        self.lambda1 = 1
+        self.tau = 1
+        # self.lambda1 = 1
 
     def forward(self, batch, encoder, train, save_memory=False):
         # length_pos_neg = numpy.random.randint(1, high=length + 1)
