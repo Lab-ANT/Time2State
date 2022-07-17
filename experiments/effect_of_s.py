@@ -139,11 +139,11 @@ def run_exp():
     result = []
     for i in range(10):
         print(i)
-        ari_list = exp_on_ActRecTut(verbose=True)
+        # ari_list = exp_on_ActRecTut(verbose=True)
         # ari_list = exp_on_MoCap(verbose=True)
         # ari_list = exp_on_UCR_SEG(verbose=True)
         # ari_list = exp_on_synthetic(verbose=True)
-        # ari_list = exp_on_USC_HAD(verbose=True)
+        ari_list = exp_on_USC_HAD(verbose=True)
         # ari_list = exp_on_PAMAP2(verbose=True)
         result.append(ari_list)
     result = np.array(result)
@@ -189,8 +189,8 @@ def exp_on_ActRecTut(verbose=False):
     return result
 
 def exp_on_USC_HAD(verbose=False):
-    # win_size = 256
-    win_size = 512
+    win_size = 256
+    # win_size = 512
     params_LSE['in_channels'] = 6
     params_LSE['compared_length'] = win_size
     params_LSE['M'] = 20
@@ -206,8 +206,8 @@ def exp_on_USC_HAD(verbose=False):
             data = normalize(data)
             t2s = Time2State(win_size, 10, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit_encoder(data)
             ari_list = []
-            # for step in [24, 52, 76, 102, 128, 154, 180, 204, 230, 256]:
-            for step in [52, 102, 154, 204, 256, 308, 358, 408, 460, 512]:
+            for step in [24, 52, 76, 102, 128, 154, 180, 204, 230, 256]:
+            # for step in [52, 102, 154, 204, 256, 308, 358, 408, 460, 512]:
                 # print('window size: %d, step size: %d' %(win_size, step))
                 t2s.set_step(step)
                 t2s.predict(data, win_size, step)
