@@ -14,6 +14,18 @@ from Time2State.default_params import *
 
 data_path = os.path.join(os.path.dirname(__file__), '../data/')
 
+def generate_step_list(win_size, num_step):
+
+    step_list = []
+
+    for j in range(1, num_step+1):
+        step_list.append(int(win_size*j/num_step))
+
+    for i in range(num_step):
+        if step_list[i]%2!=0:
+            step_list[i] += 1
+    return step_list
+
 dataset_info = {'amc_86_01.4d':{'n_segs':4, 'label':{588:0,1200:1,2006:0,2530:2,3282:0,4048:3,4579:2}},
         'amc_86_02.4d':{'n_segs':8, 'label':{1009:0,1882:1,2677:2,3158:3,4688:4,5963:0,7327:5,8887:6,9632:7,10617:0}},
         'amc_86_03.4d':{'n_segs':7, 'label':{872:0, 1938:1, 2448:2, 3470:0, 4632:3, 5372:4, 6182:5, 7089:6, 8401:0}},
@@ -46,7 +58,8 @@ def exp_on_MoCap(verbose=False):
 
         t2s = Time2State(win_size, 10, CausalConv_LSE_Adaper(params_LSE), DPGMM(15)).fit_encoder(data)
         ari_list = []
-        for step in [24, 52, 76, 102, 128, 154, 180, 204, 230, 256]:
+        step_list = generate_step_list(win_size, 20)
+        for step in step_list:
             # print('window size: %d, step size: %d' %(win_size, step))
             t2s.set_step(step)
             t2s.predict(data, win_size, step)
@@ -57,7 +70,7 @@ def exp_on_MoCap(verbose=False):
         ari_list_of_all.append(ari_list)
     ari_list_of_all = np.array(ari_list_of_all)
     result = np.mean(ari_list_of_all, axis=0)
-    print(result)
+    print(np.round(result,4))
     return result
 
 def exp_on_synthetic(verbose=False):
@@ -77,20 +90,19 @@ def exp_on_synthetic(verbose=False):
         groundtruth = df.to_numpy(dtype=int).flatten()
         t2s = Time2State(win_size, 10, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit_encoder(data)
         ari_list = []
-        # for step in range(10,201,10):
-        for step in [12, 24, 38, 52, 64, 76, 90, 102, 115, 128]:
-            # print('i: %d, window size: %d, step size: %d' %(i, win_size, step))
+        step_list = generate_step_list(win_size, 20)
+        for step in step_list:
             t2s.set_step(step)
             t2s.predict(data, win_size, step)
             prediction = t2s.state_seq
             ari, _, _ = evaluate_clustering(groundtruth, prediction)
             ari_list.append(ari)
-        print(ari_list)
+        print(np.round(ari_list,4))
         ari_list = np.array(ari_list)
         ari_list_of_all.append(ari_list)
     ari_list_of_all = np.array(ari_list_of_all)
     result = np.mean(ari_list_of_all, axis=0)
-    print(result)
+    print(np.round(result,4))
     return result
 
 def exp_on_UCR_SEG(verbose=False):
@@ -120,8 +132,8 @@ def exp_on_UCR_SEG(verbose=False):
 
         t2s = Time2State(win_size, 10, CausalConv_LSE_Adaper(params_LSE), DPGMM(6)).fit_encoder(data)
         ari_list = []
-        for step in [24, 52, 76, 102, 128, 154, 180, 204, 230, 256]:
-            # print('window size: %d, step size: %d' %(win_size, step))
+        step_list = generate_step_list(win_size, 20)
+        for step in step_list:
             t2s.set_step(step)
             t2s.predict(data, win_size, step)
             prediction = t2s.state_seq
@@ -131,24 +143,24 @@ def exp_on_UCR_SEG(verbose=False):
         ari_list_of_all.append(ari_list)
     ari_list_of_all = np.array(ari_list_of_all)
     result = np.mean(ari_list_of_all, axis=0)
-    print(result)
+    print(np.round(result,4))
     return result
 
 def run_exp():
     # repeat 10 times:
     result = []
-    for i in range(10):
+    for i in range(1):
         print(i)
         # ari_list = exp_on_ActRecTut(verbose=True)
         # ari_list = exp_on_MoCap(verbose=True)
-        # ari_list = exp_on_UCR_SEG(verbose=True)
+        ari_list = exp_on_UCR_SEG(verbose=True)
         # ari_list = exp_on_synthetic(verbose=True)
-        ari_list = exp_on_USC_HAD(verbose=True)
+        # ari_list = exp_on_USC_HAD(verbose=True)
         # ari_list = exp_on_PAMAP2(verbose=True)
         result.append(ari_list)
-    result = np.array(result)
-    result = np.mean(result, axis=0)
-    print(result)
+    # result = np.array(result)
+    # result = np.mean(result, axis=0)
+    # print(np.round(result,4))
         
 def exp_on_ActRecTut(verbose=False):
     win_size = 128
@@ -172,10 +184,8 @@ def exp_on_ActRecTut(verbose=False):
 
         t2s = Time2State(win_size, 10, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit_encoder(data)
         ari_list = []
-        # for step in range(10,201,10):
-        for step in [12, 24, 38, 52, 64, 76, 90, 102, 115, 128]:
-        # for step in [24, 52, 76, 102, 128, 154, 180, 204, 230, 256]:
-            # print('window size: %d, step size: %d' %(win_size, step))
+        step_list = generate_step_list(win_size, 20)
+        for step in step_list:
             t2s.set_step(step)
             t2s.predict(data, win_size, step)
             prediction = t2s.state_seq
@@ -185,7 +195,7 @@ def exp_on_ActRecTut(verbose=False):
         ari_list_of_all.append(ari_list)
     ari_list_of_all = np.array(ari_list_of_all)
     result = np.mean(ari_list_of_all, axis=0)
-    print(result)
+    print(np.round(result,4))
     return result
 
 def exp_on_USC_HAD(verbose=False):
@@ -206,20 +216,19 @@ def exp_on_USC_HAD(verbose=False):
             data = normalize(data)
             t2s = Time2State(win_size, 10, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit_encoder(data)
             ari_list = []
-            for step in [24, 52, 76, 102, 128, 154, 180, 204, 230, 256]:
-            # for step in [52, 102, 154, 204, 256, 308, 358, 408, 460, 512]:
-                # print('window size: %d, step size: %d' %(win_size, step))
+            step_list = generate_step_list(win_size, 20)
+            for step in step_list:
                 t2s.set_step(step)
                 t2s.predict(data, win_size, step)
                 prediction = t2s.state_seq
                 ari, _, _ = evaluate_clustering(groundtruth, prediction)
                 ari_list.append(ari)
-            print('s%dt%d'%(subject, target), ari_list)
+            print('s%dt%d'%(subject, target), np.round(ari_list,4))
             ari_list = np.array(ari_list)
             ari_list_of_all.append(ari_list)
     ari_list_of_all = np.array(ari_list_of_all)
     result = np.mean(ari_list_of_all, axis=0)
-    print(result)
+    print(np.round(result,4))
     return result
 
 def fill_nan(data):
@@ -253,8 +262,8 @@ def exp_on_PAMAP2(verbose=False):
         data = normalize(data)
         t2s = Time2State(win_size, 10, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit_encoder(data)
         ari_list = []
-        for step in [52, 102, 154, 204, 256, 308, 358, 408, 460, 512]:
-            # print('window size: %d, step size: %d' %(win_size, step))
+        step_list = generate_step_list(win_size, 20)
+        for step in step_list:
             t2s.set_step(step)
             t2s.predict(data, win_size, step)
             prediction = t2s.state_seq
