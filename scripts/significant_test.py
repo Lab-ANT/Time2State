@@ -5,8 +5,8 @@ import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
 
-# methods = ['Time2State', 'Triplet', 'TNC', 'CPC', 'TS2Vec']
-methods = ['Time2State', 'TICC', 'HDP_HSMM', 'AutoPlait', 'ClaSP', 'HVGH']
+methods = ['Time2State', 'Triplet', 'TNC', 'CPC', 'TS2Vec']
+# methods = ['Time2State', 'TICC', 'HDP_HSMM', 'AutoPlait', 'ClaSP', 'HVGH']
 datasets = ['synthetic', 'MoCap', 'USC-HAD', 'UCR-SEG', 'ActRecTut', 'PAMAP2']
 
 script_path = os.path.dirname(__file__)
