@@ -48,3 +48,7 @@ python ./scripts/prepare_data.py
 # How to Run
 
 run the *.py files in ./experiments directly
+
+# Note
+
+We have newly added a comparison between FLOSS and Time2State, the implementation code and corresponding technique report are saved in the supplements/ folder of this project. For more details, please see the README file in supplements/Compare_With_FOSS/
