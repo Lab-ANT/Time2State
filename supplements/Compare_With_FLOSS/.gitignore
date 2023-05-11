@@ -1,0 +1,13 @@
+__pycache__
+data
+figs
+figs2
+figs_FLOSS-euclidean
+figs_FLOSS-dtw
+extracted_seg_pos
+output_FLOSS
+output_FLOSS-dtw
+output_FLOSS-euclidean
+output_Time2State
+figs_Time2State
+*.asv

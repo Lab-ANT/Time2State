@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "c:\Users\USER\Desktop\Compare_With_FLOSS\cluster_segs_of_FLOSS.py", line 38, in <module>
+    cluster_on(dataset)
+  File "c:\Users\USER\Desktop\Compare_With_FLOSS\cluster_segs_of_FLOSS.py", line 32, in cluster_on
+    clustering_result = cluster_segs(data, found_cps=cps_json[file_name], n_states=num_states)
+  File "c:\Users\USER\Desktop\Compare_With_FLOSS\miniutils.py", line 73, in cluster_segs
+    ts_kmeans = TimeSeriesKMeans(n_clusters=n_states,metric='dtw').fit(segments)
+  File "D:\Anaconda3\envs\ml\lib\site-packages\tslearn\clustering\kmeans.py", line 780, in fit
+    self._fit_one_init(X_, x_squared_norms, rs)
+  File "D:\Anaconda3\envs\ml\lib\site-packages\tslearn\clustering\kmeans.py", line 665, in _fit_one_init
+    self._update_centroids(X)
+  File "D:\Anaconda3\envs\ml\lib\site-packages\tslearn\clustering\kmeans.py", line 713, in _update_centroids
+    self.cluster_centers_[k] = dtw_barycenter_averaging(
+  File "D:\Anaconda3\envs\ml\lib\site-packages\tslearn\barycenters\dba.py", line 498, in dtw_barycenter_averaging
+    bary, loss = dtw_barycenter_averaging_one_init(
+  File "D:\Anaconda3\envs\ml\lib\site-packages\tslearn\barycenters\dba.py", line 591, in dtw_barycenter_averaging_one_init
+    diag_sum_v_k, list_w_k = _mm_valence_warping(list_p_k, barycenter_size,
+  File "D:\Anaconda3\envs\ml\lib\site-packages\tslearn\barycenters\dba.py", line 303, in _mm_valence_warping
+    list_v_k, list_w_k = _subgradient_valence_warping(
+  File "D:\Anaconda3\envs\ml\lib\site-packages\tslearn\barycenters\dba.py", line 260, in _subgradient_valence_warping
+    w_k = numpy.zeros((barycenter_size, sz_k))
+numpy.core._exceptions.MemoryError: Unable to allocate 1.82 GiB for an array with shape (15650, 15650) and data type float64
