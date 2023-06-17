@@ -60,12 +60,12 @@ def effect_of_dimension():
     data = data[:30000,:]
     # print(data.shape,data)
     params_LSE['compared_length'] = 512
-    # params_LSE['M'] = 10
-    # params_LSE['N'] = 4
-    # params_LSE['nb_steps'] = 40
-    params_LSE['M'] = 20
-    params_LSE['N'] = 10
-    params_LSE['nb_steps'] = 20
+    params_LSE['M'] = 10
+    params_LSE['N'] = 4
+    params_LSE['nb_steps'] = 40
+    # params_LSE['M'] = 20
+    # params_LSE['N'] = 10
+    # params_LSE['nb_steps'] = 20
     warm_up()
     for i in range(1,21):
         params_LSE['in_channels'] = i
