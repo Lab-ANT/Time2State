@@ -34,9 +34,12 @@ def effect_of_length():
     data = np.concatenate([data[:,:4] for x in range(15)])
     params_LSE['in_channels'] = 4
     params_LSE['compared_length'] = 512
-    params_LSE['M'] = 20
-    params_LSE['N'] = 10
-    params_LSE['nb_steps'] = 20
+    params_LSE['M'] = 10
+    params_LSE['N'] = 4
+    params_LSE['nb_steps'] = 40
+    # params_LSE['M'] = 20
+    # params_LSE['N'] = 10
+    # params_LSE['nb_steps'] = 20
 
     warm_up()
     for length in range(1,21):
@@ -57,6 +60,9 @@ def effect_of_dimension():
     data = data[:30000,:]
     # print(data.shape,data)
     params_LSE['compared_length'] = 512
+    # params_LSE['M'] = 10
+    # params_LSE['N'] = 4
+    # params_LSE['nb_steps'] = 40
     params_LSE['M'] = 20
     params_LSE['N'] = 10
     params_LSE['nb_steps'] = 20
@@ -73,5 +79,5 @@ def effect_of_dimension():
     time_list = np.array(time_list)
     print(time_list.round(2))
 
-effect_of_length()
-# effect_of_dimension()
+# effect_of_length()
+effect_of_dimension()
