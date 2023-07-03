@@ -2,11 +2,11 @@ import torch
 import math
 import torch.nn as nn
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
-
+        
 class PositionalEncoding(nn.Module):
     "Implement the PE function."
 
-    def __init__(self, d_model, dropout, max_len=5000):
+    def __init__(self, d_model, dropout, max_len=512):
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(p=dropout)
 
@@ -37,24 +37,43 @@ class PositionalEncoding(nn.Module):
         return self.dropout(x)
 
 class Transformer(nn.Module):
-    def __init__(self, input_dim, d_model) -> None:
+    def __init__(self, input_dim, d_model, out_dim) -> None:
         super().__init__()
         self.fc = nn.Linear(input_dim, d_model)
         self.encoder_layer = TransformerEncoderLayer(
             d_model=d_model,
-            nhead=8,
+            nhead=4,
             dim_feedforward=4 * d_model,
             batch_first=True,
             dropout=0.1,
             # device=device
         )
-        self.encoder = TransformerEncoder(self.encoder_layer, num_layers=2)
+        self.positional_encoding = PositionalEncoding(input_dim, dropout=0.1)
+        self.encoder = TransformerEncoder(self.encoder_layer, num_layers=4)
+        self.fc2 = nn.Linear(d_model, out_dim)
+        self.reduce = torch.nn.AdaptiveMaxPool1d(1)
+
+    # def forward(self, x):
+    #     x = x.swapaxes(1, 2)
+    #     x = self.positional_encoding(x)
+    #     x = self.encoder(self.fc(x))
+    #     x = x.swapaxes(1, 2)
+    #     x = self.reduce(x)
+    #     x = x.squeeze(2)
+    #     x = self.fc2(x)
+    #     # return x[:, :, -1]
+    #     # print(x.shape)
+    #     return x
 
     def forward(self, x):
+        x = x.swapaxes(1, 2)
+        x = self.positional_encoding(x)
         x = self.encoder(self.fc(x))
-        return x[:, -1, :]
+        x = self.fc2(x)
+        x = x.swapaxes(1, 2)
+        return x[:, :, -1]
 
-data = torch.ones(8, 100, 16)
-model = Transformer(16, 320)
-out = model(data)
-print(out.shape)
+# data = torch.ones(8, 16, 100)
+# model = Transformer(16, 320, 2)
+# out = model(data)
+# print(out.shape)
