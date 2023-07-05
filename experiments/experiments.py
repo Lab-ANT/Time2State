@@ -44,7 +44,6 @@ def exp_on_MoCap(win_size, step, verbose=False):
     params_LSE['out_channels'] = 4
     params_LSE['nb_steps'] = 40
     params_LSE['win_type'] = 'hanning'
-    # params_LSE['reduced_size'] = 120
     f_list = os.listdir(base_path)
     f_list.sort()
     for idx, fname in enumerate(f_list):

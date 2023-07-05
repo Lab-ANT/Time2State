@@ -61,6 +61,7 @@ class Time2State:
         self.__encode(X, win_size, step)
         self.__cluster()
         self.__assign_label()
+        # self.__use_cps()
         return self
 
     def predict(self, X, win_size, step):
@@ -87,6 +88,7 @@ class Time2State:
         self.__encode(X, win_size, step)
         self.__cluster()
         self.__assign_label()
+        # self.__use_cps()
         return self
 
     def set_step(self, step):
@@ -122,6 +124,59 @@ class Time2State:
             vote_matrix[i:i+self.__win_size,l]+= weight_vector
             i+=self.__step
         self.__state_seq = np.array([np.argmax(row) for row in vote_matrix])
+
+    # def __calculate_velocity(self):
+    #     self.__velocity = calculate_scalar_velocity_list(self.__embeddings, interval=1)
+
+    # def map_cut_list(self, X):
+    #     return np.array(X, dtype=int)*self.__step
+
+    # def __use_cps(self):
+    #     self.__calculate_velocity()
+    #     cut_list = self.__find_potential_cp()
+    #     self.__embedding_label = self.bucket(self.__embedding_label, cut_list)
+    # def __use_cps(self):
+    #     self.__calculate_velocity()
+    #     cut_list = self.__find_potential_cp()
+    #     cut_list = self.map_cut_list(cut_list)+self.__offset
+    #     self.__state_seq = self.bucket(self.__state_seq, cut_list)
+    
+    # def __find_potential_cp(self):
+    #     # # threshold = np.mean(self.__velocity)*3
+    #     # threshold = np.percentile(self.__velocity, 95)
+    #     # idx = self.__velocity>=threshold
+    #     # pre = idx[0]
+    #     # cut_list = []
+    #     # for i, e in enumerate(idx):
+    #     #     if e == pre:
+    #     #         continue
+    #     #     else:
+    #     #         cut_list.append(i)
+    #     #         pre = e
+    #     # self.__change_points = cut_list
+    #     # return cut_list
+
+    #     # threshold = np.mean(self.__velocity)*3
+    #     threshold = np.percentile(self.__velocity, 95)
+    #     idx = np.argwhere(self.__velocity>=threshold)
+    #     return [e[0] for e in idx]
+
+    # def bucket(self, X, cut_points):
+    #     result = np.zeros(X.shape, dtype=int)
+    #     print(len(cut_points), cut_points)
+    #     pre = cut_points[0]
+    #     for cut in cut_points[1:]:
+    #         sub_seq = X[pre:cut]
+    #         label_set = list(set(sub_seq))
+    #         vote_list = []
+    #         for label in label_set:
+    #             vote_list.append(len(np.argwhere(sub_seq==label)))
+    #         max_idx = np.argmax(vote_list)
+    #         # print(max_idx, len(vote_list), label_set)
+    #         result[pre:cut]=label_set[max_idx]
+    #         pre = cut
+    #     print(result.shape, X.shape, len(cut_points), set(result))
+    #     return reorder_label(result)
 
     def save_encoder(self):
         pass
