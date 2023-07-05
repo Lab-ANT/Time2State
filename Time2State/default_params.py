@@ -64,16 +64,13 @@ params_Triplet = {
 params_LSE = {
     "batch_size": 1,
     "channels": 30,
-    "compared_length": 256,
+    "win_size": 256,
+    "win_type": 'rect', # {rect, hanning}
     "depth": 10,
     "nb_steps": 20,
     "in_channels": 1,
     "kernel_size": 3,
-    "penalty": None,
-    "early_stopping": None,
     "lr": 0.003,
-    "nb_random_samples": 10,
-    "negative_penalty": 1,
     "out_channels": 4,
     "reduced_size": 80,
     "cuda": cuda,

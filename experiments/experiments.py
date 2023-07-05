@@ -1,7 +1,6 @@
 import pandas as pd
 import sys
 import os
-import time
 from TSpy.eval import *
 from TSpy.label import *
 from TSpy.utils import *
@@ -39,11 +38,13 @@ def exp_on_MoCap(win_size, step, verbose=False):
     create_path(out_path)
     score_list = []
     params_LSE['in_channels'] = 4
-    params_LSE['compared_length'] = win_size
+    params_LSE['win_size'] = win_size
     params_LSE['M'] = 10
     params_LSE['N'] = 4
     params_LSE['out_channels'] = 4
-    params_LSE['nb_steps'] = 20
+    params_LSE['nb_steps'] = 40
+    params_LSE['win_type'] = 'hanning'
+    # params_LSE['reduced_size'] = 120
     f_list = os.listdir(base_path)
     f_list.sort()
     for idx, fname in enumerate(f_list):
@@ -52,8 +53,8 @@ def exp_on_MoCap(win_size, step, verbose=False):
         data = df.to_numpy()
         n_state=dataset_info[fname]['n_segs']
         groundtruth = seg_to_label(dataset_info[fname]['label'])[:-1]
-        # t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
-        t2s = Time2State(win_size, step, Transformer_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
+        t2s = Time2State(win_size, step, CausalConv_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
+        # t2s = Time2State(win_size, step, Transformer_LSE_Adaper(params_LSE), DPGMM(None)).fit(data, win_size, step)
         prediction = t2s.state_seq
         prediction = np.array(prediction, dtype=int)
         ari, anmi, nmi = evaluate_clustering(groundtruth, prediction)
@@ -66,4 +67,4 @@ def exp_on_MoCap(win_size, step, verbose=False):
         ,np.mean(score_list[:,2])))
 
 if __name__ == '__main__':
-    exp_on_MoCap(256, 50, verbose=True)
+    exp_on_MoCap(512, 50, verbose=True)

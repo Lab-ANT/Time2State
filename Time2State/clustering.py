@@ -6,7 +6,7 @@ from sklearn import mixture
 import numpy as np
 # import pyhsmm
 # from pyhsmm.util.text import progprint_xrange
-np.seterr(divide='ignore') # these warnings are usually harmless for this code
+# np.seterr(divide='ignore') # these warnings are usually harmless for this code
 from sklearn import cluster
 from hmmlearn.hmm import GaussianHMM, GMMHMM
 from Time2State.abstractions import *
@@ -53,7 +53,7 @@ class DPGMM(BasicClusteringClass):
                                                 covariance_type="full",
                                                 weight_concentration_prior=self.alpha, # alpha
                                                 weight_concentration_prior_type='dirichlet_process',
-                                                max_iter=100).fit(X)
+                                                max_iter=1000).fit(X)
         return dpgmm.predict(X)
 
 class KMeansClustering(BasicClusteringClass):
