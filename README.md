@@ -17,7 +17,7 @@ cd ..
 # Clone Time2State
 git clone git@github.com:Lab-ANT/Time2State
 cd Time2State
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 # Data Preparation
