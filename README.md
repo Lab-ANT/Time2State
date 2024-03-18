@@ -10,7 +10,7 @@ Running Time2State requires the installation of other packages.
 # Install TSpy
 git clone git@github.com:Lab-ANT/TSpy
 cd TSpy
-pip install requirements.txt
+pip install -r requirements.txt
 python setup.py install
 cd ..
 
